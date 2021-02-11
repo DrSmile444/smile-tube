@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import { ChannelVideosResponse, FetchVideosResponse, SearchResultResponse, Video } from '../interfaces';
 
 
@@ -28,10 +29,17 @@ export class YoutubeFormatterService {
     }
     
     formatPageVideo(video: ChannelVideosResponse.GridVideoRenderer): Video {
+        const publishedTimeText = video.publishedTimeText.simpleText;
+        const [value, units] = publishedTimeText
+            .replace('ago', '')
+            .trim()
+            .split(' ');
+
         return {
             title: video.title.runs[0].text,
             duration: video.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.text.simpleText,
-            publishedTimeText: video.publishedTimeText.simpleText,
+            publishedTimeText,
+            publishedTime: moment().subtract(+value, units as any).toDate(),
             viewCountText: video.viewCountText.simpleText,
             thumbnail: video.thumbnail.thumbnails[0].url,
             videoId: video.videoId,
