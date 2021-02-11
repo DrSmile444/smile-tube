@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smile Tube - Random Video Getter</title>
+    <link rel="stylesheet" href="./index.frontend.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&amp;display=swap" rel="stylesheet">
+</head>
+<body>
+    <input type="file" data-file-input>
+
+    <input type="text" placeholder="Video name..." data-name-search>
+
+    <button data-randomize>Randomize</button>
+
+    <div class="video-container" data-video-container></div>
+
+    <template data-video-card-template>
+        <section class="video-card">
+            <a class="video-card__link" data-video-link target="_blank">
+                <span class="relative">
+                    <img src="" alt="Video image" data-video-image>
+                    <span class="video-card__duration" data-video-duration></span>
+                </span>
+                <h3 class="video-card__title" data-video-title></h3>
+
+                <span class="video-card-footer">
+                    <span class="video-card-footer__views" data-video-views></span>
+                    <span class="video-card-footer__point">•</span>
+                    <span class="video-card-footer__published" data-video-published></span>
+                </span>
+            </a>
+        </section>
+    </template>
+
+    <script src="./virtual-scroller.js"></script>
+    <script src="./virtual-scroller-dom.js"></script>
+
+    <script src="./index.frontend.js"></script>
+</body>
+</html>

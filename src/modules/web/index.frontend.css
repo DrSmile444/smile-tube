@@ -1,0 +1,55 @@
+body {
+  font-family: Roboto, sans-serif;
+  background-color: #f1f1f1;
+}
+
+.relative {
+  position: relative;
+}
+
+.video-container {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 1074px;
+  margin: auto;
+}
+
+.video-card {
+  width: 168px;
+  padding: 5px;
+  position: relative;
+}
+
+.video-card__title {
+  color: black;
+  font-size: 14px;
+  margin: 5px 0 0;
+}
+
+.video-card__link {
+  height: 100%;
+  display: block;
+  text-decoration: none;
+}
+
+.video-card__duration {
+  position: absolute;
+  right: 4px;
+  bottom: 8px;
+  background: black;
+  color: white;
+  padding: 2px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.video-card-footer {
+  margin-top: 5px;
+  font-size: 11px;
+  color: gray;
+  display: flex;
+}
+
+.video-card-footer__point {
+  margin: 0 5px;
+}
