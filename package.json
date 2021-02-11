@@ -1,0 +1,28 @@
+{
+  "name": "smile-tube",
+  "version": "1.0.0",
+  "description": "Get a full list of your favorite youtube channel and find a random video",
+  "main": "./src/app.ts",
+  "scripts": {
+    "start": "ts-node ./src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dmytro Vakulenko",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.25"
+  },
+  "keywords": [
+    "youtube",
+    "videos",
+    "channel",
+    "youtube videos",
+    "youtube channel",
+    "youtube api"
+  ]
+}

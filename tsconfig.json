@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "experimentalDecorators": true,
+    "lib": ["es2017", "dom"],
+    "module": "commonjs",
+    "outDir": "dist",
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "es5"
+  },
+  "exclude": ["node_modules", "dist"]
+}
