@@ -1,9 +1,8 @@
 import { YoutubeService, youtubeService } from '../youtube-api';
 import * as fs from 'fs';
 
-const channelName = 'Stopgame';
 
-console.log(process.cwd())
+const [node, file, channelName] = process.argv;
 
 class App {
     constructor(private youtubeService: YoutubeService) {
