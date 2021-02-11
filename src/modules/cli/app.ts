@@ -1,7 +1,7 @@
-import { YoutubeService, youtubeService } from './services';
+import { YoutubeService, youtubeService } from '../youtube-api';
 import * as fs from 'fs';
 
-const channelName = '';
+const channelName = 'Stopgame';
 
 console.log(process.cwd())
 

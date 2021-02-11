@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FetchVideosResponse } from '../../interfaces';
+import { FetchVideosResponse } from '../interfaces';
 
 
 export class YoutubeCoreService {

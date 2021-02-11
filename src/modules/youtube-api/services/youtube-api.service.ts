@@ -1,4 +1,4 @@
-import { ChannelVideosResponse, SearchResultResponse } from '../../interfaces';
+import { ChannelVideosResponse, SearchResultResponse } from '../interfaces';
 import { YoutubeCoreService } from './youtube-core.service';
 import { YoutubeFormatterService } from './youtube-formatter.service';
 

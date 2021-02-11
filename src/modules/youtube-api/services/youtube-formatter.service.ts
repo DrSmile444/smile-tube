@@ -1,4 +1,4 @@
-import { ChannelVideosResponse, FetchVideosResponse, SearchResultResponse, Video } from '../../interfaces';
+import { ChannelVideosResponse, FetchVideosResponse, SearchResultResponse, Video } from '../interfaces';
 
 
 export class YoutubeFormatterService {

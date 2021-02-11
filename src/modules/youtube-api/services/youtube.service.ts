@@ -1,4 +1,4 @@
-import { Video } from '../../interfaces';
+import { Video } from '../interfaces';
 import { YoutubeApiService } from './youtube-api.service';
 
 
