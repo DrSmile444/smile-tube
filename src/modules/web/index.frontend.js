@@ -5,12 +5,19 @@ const randomizeButton = document.querySelector('[data-randomize]');
 
 const nameSearchNode = document.querySelector('[data-name-search]');
 
-let videoCards = [];
+/**
+ * @type {Video[]}
+ * */
+let videos = [];
+
+/**
+ * @type {Video[]}
+ * */
 let filteredCards = [];
 
 const virtualScroller = new VirtualScroller(
     videoContainerNode,
-    videoCards,
+    videos,
     createCardNode,
 );
 
@@ -23,14 +30,14 @@ fileInputNode.addEventListener('change', async (event) => {
     }
 
     videoContainerNode.innerHTML = '';
-    videoCards = JSON.parse(await readFile(file));
-    filteredCards = videoCards;
+    videos = JSON.parse(await readFile(file));
+    filteredCards = videos;
 
-    virtualScroller.setItems(videoCards);
+    virtualScroller.setItems(videos);
 });
 
 nameSearchNode.addEventListener('input', () => {
-    filteredCards = videoCards.filter((card) => card.title.toLowerCase().includes(nameSearchNode.value.toLowerCase()))
+    filteredCards = videos.filter((card) => card.title.toLowerCase().includes(nameSearchNode.value.toLowerCase()))
     virtualScroller.setItems(filteredCards);
 });
 
@@ -39,14 +46,17 @@ randomizeButton.addEventListener('click', () => {
     virtualScroller.setItems(filteredCards);
 });
 
-function createCardNode(card) {
+/**
+ * @param {Video} video
+ * */
+function createCardNode(video) {
     const newCardNode = cardTemplateNode.content.cloneNode(true);
-    newCardNode.querySelector('[data-video-link]').href = card.watchUrl;
-    newCardNode.querySelector('[data-video-image]').src = card.thumbnail;
-    newCardNode.querySelector('[data-video-title]').innerText = card.title;
-    newCardNode.querySelector('[data-video-duration]').innerText = card.duration;
-    newCardNode.querySelector('[data-video-views]').innerText = card.viewCountText;
-    newCardNode.querySelector('[data-video-published]').innerText = card.publishedTimeText;
+    newCardNode.querySelector('[data-video-link]').href = video.watchUrl;
+    newCardNode.querySelector('[data-video-image]').src = video.thumbnail;
+    newCardNode.querySelector('[data-video-title]').innerText = video.title;
+    newCardNode.querySelector('[data-video-duration]').innerText = video.duration;
+    newCardNode.querySelector('[data-video-views]').innerText = video.viewCountText;
+    newCardNode.querySelector('[data-video-published]').innerText = video.publishedTimeText;
 
     return newCardNode;
 }
@@ -59,6 +69,11 @@ function readFile(file) {
     });
 }
 
+/**
+ * @template T
+ * @param {T} array
+ * @return T
+ * */
 function shuffle(array) {
     let currentIndex = array.length;
     let temporaryValue;
