@@ -1,10 +1,18 @@
 import * as moment from 'moment';
+
 import { ChannelVideosResponse, FetchVideosResponse, SearchResultResponse, Video } from '../interfaces';
 
 
 export class YoutubeFormatterService {
     formatSearchResponse(response: SearchResultResponse.RootObject) {
-        return response.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents;
+        return response
+            .contents
+            .twoColumnSearchResultsRenderer
+            .primaryContents
+            .sectionListRenderer
+            .contents[0]
+            .itemSectionRenderer
+            .contents;
     }
 
     formatChannel(channel: SearchResultResponse.ChannelRenderer) {
@@ -21,13 +29,24 @@ export class YoutubeFormatterService {
     }
 
     formatChannelVideoResponse(response: ChannelVideosResponse.RootObject) {
-        return response.contents.twoColumnBrowseResultsRenderer.tabs[1].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].gridRenderer.items;
+        return response
+            .contents
+            .twoColumnBrowseResultsRenderer
+            .tabs[1]
+            .tabRenderer
+            .content
+            .sectionListRenderer
+            .contents[0]
+            .itemSectionRenderer
+            .contents[0]
+            .gridRenderer
+            .items;
     }
 
     formatFetchVideoResponse(response: FetchVideosResponse.RootObject) {
         return response[1].response.onResponseReceivedActions[0].appendContinuationItemsAction.continuationItems;
     }
-    
+
     formatPageVideo(video: ChannelVideosResponse.GridVideoRenderer): Video {
         const publishedTimeText = video.publishedTimeText.simpleText;
         const [value, units] = publishedTimeText
@@ -45,7 +64,7 @@ export class YoutubeFormatterService {
             videoId: video.videoId,
             // maybe remove, can bebuild from scratch
             watchUrl: `https://www.youtube.com${video.navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
-        }
+        };
     }
 
     formatContinuation(continuation: ChannelVideosResponse.ContinuationItemRenderer) {

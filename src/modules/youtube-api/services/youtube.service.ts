@@ -11,7 +11,7 @@ export class YoutubeService {
 
         console.log('Got channel ' + channel.title + ',', channel.videoCount, 'videos');
 
-        const pagesCount = Math.ceil(channel.videoCount / 30)
+        const pagesCount = Math.ceil(channel.videoCount / 30);
         const channelVideos = await this.youtubeApiService.fetchChannelVideos(channel.channelId);
         let nextContinuation = channelVideos.nextContinuation;
 

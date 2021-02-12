@@ -2324,6 +2324,7 @@ export declare module SearchResultResponse {
         desktopTopbarRenderer: DesktopTopbarRenderer;
     }
 
+    // tslint:disable-next-line:no-empty-interface
     export interface AdSafetyReason {
     }
 
