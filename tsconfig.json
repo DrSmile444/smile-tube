@@ -4,13 +4,15 @@
     "declaration": true,
     "experimentalDecorators": true,
     "lib": ["es2017", "dom"],
+    "types": ["reflect-metadata", "node"],
     "module": "commonjs",
     "outDir": "dist",
     "removeComments": true,
     "resolveJsonModule": true,
     "sourceMap": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "es5"
+    "target": "es5",
+    "emitDecoratorMetadata": true
   },
   "exclude": ["node_modules", "dist"]
 }
