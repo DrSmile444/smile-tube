@@ -1,9 +1,13 @@
+import { inject, injectable } from 'inversify';
+
 import { Video } from '../interfaces';
+import { YoutubeTypes } from '../youtube-types';
 import { YoutubeApiService } from './youtube-api.service';
 
 
+@injectable()
 export class YoutubeService {
-    constructor(private youtubeApiService: YoutubeApiService) {}
+    @inject(YoutubeTypes.YoutubeApiService) private youtubeApiService: YoutubeApiService;
 
     async fetchVideosFromChannel(channelName: string) {
         const channel = await this.youtubeApiService.searchChannel(channelName);

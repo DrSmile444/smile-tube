@@ -1,13 +1,15 @@
+import { inject, injectable } from 'inversify';
+
 import { ChannelVideosResponse, SearchResultResponse } from '../interfaces';
+import { YoutubeTypes } from '../youtube-types';
 import { YoutubeCoreService } from './youtube-core.service';
 import { YoutubeFormatterService } from './youtube-formatter.service';
 
 
+@injectable()
 export class YoutubeApiService {
-    constructor(
-        private youtubeCoreService: YoutubeCoreService,
-        private youtubeFormatterService: YoutubeFormatterService,
-    ) {}
+    @inject(YoutubeTypes.YoutubeCoreService) private youtubeCoreService: YoutubeCoreService;
+    @inject(YoutubeTypes.YoutubeFormatterService) private youtubeFormatterService: YoutubeFormatterService;
 
     /**
      * Searches for channel on youtube and returns the first one

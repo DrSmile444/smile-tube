@@ -1,8 +1,10 @@
 import axios from 'axios';
+import { injectable } from 'inversify';
 
 import { FetchVideosResponse } from '../interfaces';
 
 
+@injectable()
 export class YoutubeCoreService {
     private readonly PAGE_RESPONSE_REGEXP = /<script>var ytInitialData = ({.*});<\/script>/;
 

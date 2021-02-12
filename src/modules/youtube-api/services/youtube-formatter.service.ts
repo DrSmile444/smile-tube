@@ -1,8 +1,10 @@
+import { injectable } from 'inversify';
 import * as moment from 'moment';
 
 import { ChannelVideosResponse, FetchVideosResponse, SearchResultResponse, Video } from '../interfaces';
 
 
+@injectable()
 export class YoutubeFormatterService {
     formatSearchResponse(response: SearchResultResponse.RootObject) {
         return response
