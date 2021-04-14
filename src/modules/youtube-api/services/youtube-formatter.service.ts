@@ -45,8 +45,8 @@ export class YoutubeFormatterService {
             .items;
     }
 
-    formatFetchVideoResponse(response: FetchVideosResponse.RootObject) {
-        return response[1].response.onResponseReceivedActions[0].appendContinuationItemsAction.continuationItems;
+    formatFetchVideoResponse(response: FetchVideosResponse.RootObject['response']) {
+        return response.onResponseReceivedActions[0].appendContinuationItemsAction.continuationItems;
     }
 
     formatPageVideo(video: ChannelVideosResponse.GridVideoRenderer): Video {

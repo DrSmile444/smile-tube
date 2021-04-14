@@ -5,6 +5,7 @@
   "main": "src/modules/cli/app.ts",
   "scripts": {
     "start": "ts-node src/modules/cli/app.ts",
+    "start:stopgame": "npm start -- stopgame",
     "lint": "tslint --project .",
     "lint:fix": "tslint --project . --fix",
     "test": "echo \"Error: no test specified\" && exit 1"

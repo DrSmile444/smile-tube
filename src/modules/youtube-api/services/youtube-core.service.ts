@@ -6,7 +6,14 @@ import { FetchVideosResponse } from '../interfaces';
 
 @injectable()
 export class YoutubeCoreService {
-    private readonly PAGE_RESPONSE_REGEXP = /<script>var ytInitialData = ({.*});<\/script>/;
+    private readonly PAGE_RESPONSE_REGEXP = /<script.*var ytInitialData = ({.*});<\/script>/;
+    private readonly INNERTUBE_API_KEY_REGEXP = /"INNERTUBE_API_KEY":"(.+?)"/;
+    private readonly INNERTUBE_CLIENT_VERSION_REGEXP = /"INNERTUBE_CLIENT_VERSION":"(.+?)",/;
+
+    private innertubeCreds = {
+        key: '',
+        version: '',
+    };
 
     /**
      * Returns fetched youtube page HTML
@@ -26,27 +33,35 @@ export class YoutubeCoreService {
 
         return axios.get<string>(url, options)
             .then((response) => response.data)
-            .then((html) => this.parseData<T>(html));
+            .then((html) => this.processData<T>(html));
     }
 
-    fetchContinuation(continuation: string): Promise<FetchVideosResponse.RootObject> {
-        const url = `https://www.youtube.com/browse_ajax?ctoken=4qmFsgJwEhhVQ3E3Slo4QVRnUVdldTZzRE0xY3pqaGcaNkVnWjJhV1JsYjNNWUF5QUFNQUU0QWVvREUwTm5RVk5EWjJsS2J6UlhVM2RoVUhwZmJVRSUzRJICGxoXaHR0cHM6Ly93d3cueW91dHViZS5jb20iAA%253D%253D&continuation=${continuation}&itct=CCYQybcCIhMIrIDjroe67gIVBiyyCh0XUwZm`;
-        const options = {
-            url,
-            headers: {
-                accept: '*/*',
-                'accept-language': 'en-US,en;q=0.9',
-                'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:42.0) Gecko/20100101 Firefox/42.0',
-                'x-youtube-client-name': '1',
-                'x-youtube-client-version': '2.20210120.08.00',
+    fetchContinuation(continuation: string): Promise<FetchVideosResponse.RootObject['response']> {
+        const { key, version } = this.innertubeCreds;
+
+        const url = `https://www.youtube.com/youtubei/v1/browse?key=${key}`;
+        const body = {
+            context: {
+                client: {
+                    clientName: 'WEB',
+                    clientVersion: version, // 2.20210413.07.00
+                },
             },
+            continuation,
         };
 
-        return axios.get(url, options).then((response) => response.data);
+        return axios.post(url, body).then((response) => response.data).catch((err) => console.error(JSON.stringify(err)));
     }
 
-    private parseData<T>(html: string): T {
+    private processData<T>(html: string): T {
         const youtubeResponse = html.match(this.PAGE_RESPONSE_REGEXP)[1];
+        const innertubeKey = html.match(this.INNERTUBE_API_KEY_REGEXP)[1];
+        const innertubeVersion = html.match(this.INNERTUBE_CLIENT_VERSION_REGEXP)[1];
+
+        this.innertubeCreds = {
+            key: innertubeKey,
+            version: innertubeVersion,
+        };
 
         return JSON.parse(youtubeResponse) as T;
     }
