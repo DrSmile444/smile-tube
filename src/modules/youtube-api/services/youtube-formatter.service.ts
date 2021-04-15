@@ -24,7 +24,7 @@ export class YoutubeFormatterService {
             videoCount: +channel.videoCountText.runs[0].text.replace(/,/g, ''),
             channelId: channel.channelId,
             url: channel.navigationEndpoint.commandMetadata.webCommandMetadata.url,
-            thumbnail: 'https:' + channel.thumbnail.thumbnails[0].url,
+            thumbnail: 'https:' + channel.thumbnail.thumbnails[channel.thumbnail.thumbnails.length - 1].url,
             // maybe remove, can bebuild from scratch
             channelUrl: `https://www.youtube.com${channel.navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
         };
@@ -62,7 +62,7 @@ export class YoutubeFormatterService {
             publishedTimeText,
             publishedTime: moment().subtract(+value, units as any).toDate(),
             viewCountText: video.viewCountText.simpleText,
-            thumbnail: video.thumbnail.thumbnails[0].url,
+            thumbnail: video.thumbnail.thumbnails[video.thumbnail.thumbnails.length - 1].url,
             videoId: video.videoId,
             // maybe remove, can bebuild from scratch
             watchUrl: `https://www.youtube.com${video.navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
