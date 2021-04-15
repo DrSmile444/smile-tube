@@ -3,6 +3,7 @@ import * as tg from 'telegraf/src/core/types/typegram';
 import * as tt from 'telegraf/src/telegram-types';
 
 import { youtubeService } from '../youtube-api';
+import { botLocalesEn } from './locales/bot_en';
 require('dotenv').config();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
@@ -50,19 +51,20 @@ function delayMessage(time) {
 
 bot.on('text', async (ctx) => {
     const chatId = ctx.message.from.id;
+    const username = ctx.update.message.from.username;
+    const message = ctx.message.text;
+    const { telegram } = ctx;
 
-    ctx.reply(`👋 Hello, @${ctx.update.message.from.username}!\n🔍 Searching for a passed channel\n\n*${ctx.message.text}*`, { parse_mode: 'Markdown' });
-    ctx.telegram.sendChatAction(chatId, 'typing');
+    ctx.reply(botLocalesEn.welcome(username, message), { parse_mode: 'Markdown' })
+        .then(() => telegram.sendChatAction(chatId, 'typing'));
 
     try {
-        const videos = await youtubeService.fetchVideosFromChannel(ctx.message.text, 30);
+        const videos = await youtubeService.fetchVideosFromChannel(message, 30);
         const channelData = {
             thumbnail: videos.channel.thumbnail,
             options: {
                 parse_mode: 'Markdown',
-                caption: '🔍 Found the channel!\n*'
-                    + videos.channel.title + '* with *' + videos.channel.videoCount + '* videos.\n\n'
-                    + '🎲 Showing random 10 videos:',
+                caption: botLocalesEn.foundChannel(videos.channel.title, videos.channel.videoCount),
             } as tt.ExtraPhoto,
         };
 
@@ -73,17 +75,17 @@ bot.on('text', async (ctx) => {
             type: 'photo',
         }));
 
-        ctx.telegram.sendPhoto(chatId, channelData.thumbnail, channelData.options)
+        telegram.sendPhoto(chatId, channelData.thumbnail, channelData.options)
+            .then(() => telegram.sendChatAction(chatId, 'typing'))
             .then(delayMessage(1000))
-            .then(() => ctx.telegram.sendDice(chatId))
+            .then(() => telegram.sendDice(chatId))
+            .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
             .then(delayMessage(2000))
             .then(() => ctx.replyWithMediaGroup(mediaGroup));
     } catch (e) {
         console.error(e);
-        ctx.reply(`Cannot find ${ctx.message.text} channel. Please, try another`);
+        ctx.reply(botLocalesEn.error(message));
     }
-
-
 });
 
 bot.launch().then(() => console.log('*** Bot has been started ***'));
