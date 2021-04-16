@@ -397,7 +397,7 @@ export declare module ChannelVideosResponse {
         videoId: string;
         thumbnail: Thumbnail;
         title: Title;
-        publishedTimeText: PublishedTimeText;
+        publishedTimeText?: PublishedTimeText;
         viewCountText: ViewCountText;
         navigationEndpoint: NavigationEndpoint;
         ownerBadges: OwnerBadge[];
@@ -405,6 +405,15 @@ export declare module ChannelVideosResponse {
         shortViewCountText: ShortViewCountText;
         menu: Menu;
         thumbnailOverlays: ThumbnailOverlay[];
+        upcomingEventData?: {
+            startTime: string,
+            isReminderSet: boolean,
+            upcomingEventText: {
+                runs: {
+                    text: string;
+                }[];
+            },
+        };
     }
 
     export interface WebCommandMetadata8 {

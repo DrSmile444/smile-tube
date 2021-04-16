@@ -50,17 +50,25 @@ export class YoutubeFormatterService {
     }
 
     formatPageVideo(video: ChannelVideosResponse.GridVideoRenderer): Video {
-        const publishedTimeText = video.publishedTimeText.simpleText;
-        const [value, units] = publishedTimeText
-            .replace('ago', '')
-            .trim()
-            .split(' ');
+        // TODO refactor this
+        const publishedTimeText = video.publishedTimeText ?
+            video.publishedTimeText.simpleText :
+            'Premiere';
+
+        const [value, units] = video.publishedTimeText ?
+            publishedTimeText
+                .replace('ago', '')
+                .trim()
+                .split(' ') :
+            [];
 
         return {
             title: video.title.runs[0].text,
             duration: video.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.text.simpleText,
             publishedTimeText,
-            publishedTime: moment().subtract(+value, units as any).toDate(),
+            publishedTime: video.publishedTimeText ?
+                moment().subtract(+value, units as any).toDate() :
+                new Date(+video.upcomingEventData.startTime * 1000),
             viewCountText: video.viewCountText.simpleText,
             thumbnail: video.thumbnail.thumbnails[video.thumbnail.thumbnails.length - 1].url,
             videoId: video.videoId,
