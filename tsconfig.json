@@ -4,7 +4,7 @@
     "declaration": true,
     "experimentalDecorators": true,
     "lib": ["es2017", "dom"],
-    "types": ["reflect-metadata", "node"],
+    "types": ["reflect-metadata", "node", "jest"],
     "module": "commonjs",
     "outDir": "dist",
     "removeComments": true,

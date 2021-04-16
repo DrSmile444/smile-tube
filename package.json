@@ -9,7 +9,7 @@
     "start:bot": "ts-node src/modules/bot/app.ts",
     "lint": "tslint --project .",
     "lint:fix": "tslint --project . --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ts-jest"
   },
   "author": "Dmytro Vakulenko",
   "license": "MIT",
@@ -25,7 +25,14 @@
     "typescript": "^4.1.5"
   },
   "devDependencies": {
-    "@types/node": "^14.14.25"
+    "@babel/core": "^7.13.15",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.25",
+    "babel-jest": "^26.6.3",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.5"
   },
   "keywords": [
     "youtube",
