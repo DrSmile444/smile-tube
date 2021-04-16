@@ -12,7 +12,7 @@ class App {
     @inject(AppTypes.YoutubeService) private youtubeService: YoutubeService;
 
     async start(channelName: string) {
-        const { videos, channel } = await this.youtubeService.fetchVideosFromChannel(channelName);
+        const { videos, channel } = await this.youtubeService.updateChannelVideosList(channelName);
         fs.writeFileSync(`./videos/videos.${channel.title}.${Date.now()}.json`, JSON.stringify(videos, null, '  '));
     }
 }

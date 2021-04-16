@@ -59,7 +59,7 @@ bot.on('text', async (ctx) => {
         .then(() => telegram.sendChatAction(chatId, 'typing'));
 
     try {
-        const videos = await youtubeService.fetchVideosFromChannel(message, 30);
+        const videos = await youtubeService.updateChannelVideosList(message);
         const channelData = {
             thumbnail: videos.channel.thumbnail,
             options: {
