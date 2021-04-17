@@ -8,3 +8,13 @@ export interface Video {
     videoId: string;
     watchUrl: string;
 }
+
+export interface Channel {
+    title: string;
+    description: string;
+    videoCount: number;
+    channelId: string;
+    url: string;
+    thumbnail: string;
+    channelUrl: string;
+}

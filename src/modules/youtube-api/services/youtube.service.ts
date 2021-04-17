@@ -1,7 +1,9 @@
 import { inject, injectable } from 'inversify';
+import { BehaviorSubject } from 'rxjs';
+import { skip } from 'rxjs/operators';
 
 import { storageService } from '../../storage';
-import { Video } from '../interfaces';
+import { FetchAction, FetchActionType, Video } from '../interfaces';
 import { YoutubeTypes } from '../youtube-types';
 import { YoutubeApiService } from './youtube-api.service';
 
@@ -12,46 +14,75 @@ export class YoutubeService {
 
     private readonly DEFAULT_VIDEOS_COUNT = 300;
 
-    async updateChannelVideosList(channelName: string) {
-        console.log('updateChannelVideosList start with:', channelName);
-        const channel = await this.youtubeApiService.searchChannel(channelName);
-        console.log('! Got channel ' + channel.title + ',', channel.videoCount, 'videos');
+    updateChannelVideosList(channelName: string) {
+        const stream$: BehaviorSubject<FetchAction> = new BehaviorSubject<FetchAction>(null);
 
-        const fetchedVideos = await storageService.getChannelVideos(channel.title);
+        (async () => {
+            console.log('updateChannelVideosList start with:', channelName);
+            const channel = await this.youtubeApiService.searchChannel(channelName);
+            console.log('! Got channel ' + channel.title + ',', channel.videoCount, 'videos');
+            stream$.next({
+                type: FetchActionType.FOUND_CHANNEL,
+                payload: {channel},
+            });
 
-        if (!fetchedVideos) {
-            console.log('! Channel not fetched yet! Fetching a new channel');
-            return this.fetchVideos(channel, this.DEFAULT_VIDEOS_COUNT);
-        }
+            const fetchedVideos = await storageService.getChannelVideos(channel.title);
 
-        const videos: Video[] = [];
-
-        const pagesCount = Math.ceil(channel.videoCount / 30);
-        const channelVideos = await this.youtubeApiService.fetchChannelVideos(channel.channelId);
-        let nextContinuation = channelVideos.nextContinuation;
-
-        videos.push(...channelVideos.videos);
-        let isAllUpdated = storageService.checkFetchedVideos(fetchedVideos, channelVideos.videos);
-
-        for (let page = 2; nextContinuation; page++) {
-            if (isAllUpdated) {
-                console.log('! All new videos fetched!');
-                return {
-                    channel,
-                    videos: storageService.updateFetchedVideos(channel.title, fetchedVideos, videos),
-                };
+            if (!fetchedVideos) {
+                console.log('! Channel not fetched yet! Fetching a new channel');
+                return this.fetchVideos(channel, stream$, this.DEFAULT_VIDEOS_COUNT);
             }
 
-            const continuationItems = await this.youtubeApiService.fetchContinuation(nextContinuation);
-            videos.push(...continuationItems.videos);
-            nextContinuation = continuationItems.nextContinuation;
-            isAllUpdated = storageService.checkFetchedVideos(fetchedVideos, continuationItems.videos);
+            const videos: Video[] = [];
 
-            console.log('* Got page', page, '/', pagesCount, 'with', continuationItems.videos.length, 'videos');
-        }
+            const pagesCount = Math.ceil(channel.videoCount / 30);
+            const channelVideos = await this.youtubeApiService.fetchChannelVideos(channel.channelId);
+            let nextContinuation = channelVideos.nextContinuation;
+
+            const addedVideos = channelVideos.videos
+                .filter((video) => !fetchedVideos.some((fetchedVideo) => fetchedVideo.videoId === video.videoId));
+
+            videos.unshift(...addedVideos);
+            let isAllUpdated = storageService.checkFetchedVideos(fetchedVideos, channelVideos.videos);
+
+            for (let page = 2; nextContinuation; page++) {
+                if (isAllUpdated) {
+                    console.log('! All new videos fetched!');
+                    stream$.next({
+                        type: FetchActionType.FETCH_END,
+                        payload: {
+                            channel,
+                            videos: storageService.updateFetchedVideos(channel.title, fetchedVideos, videos),
+                        },
+                    });
+                    stream$.complete();
+                    return;
+                }
+
+                const continuationItems = await this.youtubeApiService.fetchContinuation(nextContinuation);
+                videos.push(...continuationItems.videos);
+                nextContinuation = continuationItems.nextContinuation;
+                isAllUpdated = storageService.checkFetchedVideos(fetchedVideos, continuationItems.videos);
+
+                if (page % 3 === 0) {
+                    stream$.next({
+                        type: FetchActionType.VIDEOS_FETCHED,
+                        payload: { videos },
+                    });
+                }
+
+                console.log('* Got page', page, '/', pagesCount, 'with', continuationItems.videos.length, 'videos');
+            }
+        })().then().catch((error) => {
+            console.log('!!! Caught error');
+            stream$.next({ type: FetchActionType.ERROR, payload: { error } } as FetchAction);
+            stream$.complete();
+        });
+
+        return stream$.pipe(skip(1));
     }
 
-    private async fetchVideos(channel, videosCount?: number) {
+    private async fetchVideos(channel, stream$: BehaviorSubject<FetchAction>, videosCount?: number) {
         const videos: Video[] = [];
 
         const pagesCount = Math.ceil(channel.videoCount / 30);
@@ -68,6 +99,14 @@ export class YoutubeService {
 
         for (let page = 2; nextContinuation; page++) {
             if (videosCount && videosCount <= videos.length) {
+                stream$.next({
+                    type: FetchActionType.FETCH_END,
+                    payload: {
+                        channel,
+                        videos: storageService.updateFetchedVideos(channel.title, videos),
+                    },
+                });
+                stream$.complete();
                 break;
             }
 
@@ -75,12 +114,17 @@ export class YoutubeService {
             videos.push(...continuationItems.videos);
             nextContinuation = continuationItems.nextContinuation;
 
+            if (page % 3 === 0) {
+                stream$.next({
+                    type: FetchActionType.VIDEOS_FETCHED,
+                    payload: { videos },
+                });
+            }
+
             console.log('* Got page', page, '/', pagesCount, 'with', continuationItems.videos.length,
                 'videos. Total videos', videos.length);
         }
 
-        storageService.updateFetchedVideos(channel.title, videos);
-
-        return { channel, videos };
+        return stream$.pipe(skip(1));
     }
 }

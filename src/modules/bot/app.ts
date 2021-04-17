@@ -2,7 +2,7 @@ import { Telegraf } from 'telegraf';
 import * as tg from 'telegraf/src/core/types/typegram';
 import * as tt from 'telegraf/src/telegram-types';
 
-import { youtubeService } from '../youtube-api';
+import { Channel, FetchAction, FetchActionPayload, FetchActionType, youtubeService } from '../youtube-api';
 import { botLocalesEn } from './locales/bot_en';
 require('dotenv').config();
 
@@ -59,32 +59,59 @@ bot.on('text', async (ctx) => {
         .then(() => telegram.sendChatAction(chatId, 'typing'));
 
     try {
-        const videos = await youtubeService.updateChannelVideosList(message);
-        const channelData = {
-            thumbnail: videos.channel.thumbnail,
-            options: {
-                parse_mode: 'Markdown',
-                caption: botLocalesEn.foundChannel(videos.channel.title, videos.channel.videoCount),
-            } as tt.ExtraPhoto,
-        };
+        let channel: Channel;
 
-        const randomVideos = getRandomItemsFromArray(videos.videos, 10);
-        const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = randomVideos.map((video) => ({
-            caption: video.title + '\n\n' + video.watchUrl,
-            media: video.thumbnail,
-            type: 'photo',
-        }));
+        youtubeService.updateChannelVideosList(message)
+            .subscribe((action: FetchAction) => {
+                switch (action.type) {
+                    case FetchActionType.FOUND_CHANNEL:
+                        channel = (action.payload as FetchActionPayload<FetchActionType.FOUND_CHANNEL>).channel;
 
-        telegram.sendPhoto(chatId, channelData.thumbnail, channelData.options)
-            .then(() => telegram.sendChatAction(chatId, 'typing'))
-            .then(delayMessage(1000))
-            .then(() => telegram.sendDice(chatId))
-            .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
-            .then(delayMessage(2000))
-            .then(() => ctx.replyWithMediaGroup(mediaGroup));
+                        const channelData = {
+                            thumbnail: channel.thumbnail,
+                            options: {
+                                parse_mode: 'Markdown',
+                                caption: botLocalesEn.foundChannel(channel.title, channel.videoCount),
+                            } as tt.ExtraPhoto,
+                        };
+
+                        telegram.sendPhoto(chatId, channelData.thumbnail, channelData.options);
+                        break;
+
+                    case FetchActionType.VIDEOS_FETCHED:
+                        // @ts-ignore
+                        const { videos } = action.payload as FetchActionPayload<FetchActionType.VIDEOS_FETCHED>;
+
+                        ctx.reply(botLocalesEn.fetchVideo(channel.videoCount, videos.length));
+                        break;
+
+                    case FetchActionType.FETCH_END:
+                        // @ts-ignore
+                        const { videos } = action.payload as FetchActionPayload<FetchActionType.FETCH_END>;
+                        const randomVideos = getRandomItemsFromArray(videos, 10);
+                        const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = randomVideos.map((video) => ({
+                            caption: video.title + '\n\n' + video.watchUrl,
+                            media: video.thumbnail,
+                            type: 'photo',
+                        }));
+
+                        ctx.reply(botLocalesEn.fetchAllVideos(videos.length))
+                            .then(delayMessage(2000))
+                            .then(() => telegram.sendDice(chatId))
+                            .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
+                            .then(delayMessage(2000))
+                            .then(() => ctx.replyWithMediaGroup(mediaGroup));
+                        break;
+
+                    case FetchActionType.ERROR:
+                        const { error } = action.payload as FetchActionPayload<FetchActionType.ERROR>;
+                        ctx.reply(botLocalesEn.error(message)).then(() => ctx.reply(error.message));
+                }
+            });
     } catch (e) {
         console.error(e);
         ctx.reply(botLocalesEn.error(message));
+        ctx.reply(e);
     }
 });
 
