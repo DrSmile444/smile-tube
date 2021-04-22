@@ -1,14 +1,19 @@
 import axios from 'axios';
-import { Telegraf } from 'telegraf';
+import { Markup, Telegraf } from 'telegraf';
 import { Context } from 'telegraf/src/context';
 import * as tg from 'telegraf/src/core/types/typegram';
 import * as tt from 'telegraf/src/telegram-types';
 
 import { asyncFilter } from '../../utils';
-import { FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../youtube-api';
+import { Channel, FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../youtube-api';
 import { botLocalesEn } from './locales/bot_en';
 import { getRandomItemsFromArray } from './utils';
 require('dotenv').config();
+
+/**
+ * @deprecated
+ * */
+const deprecatedState: { [key: number]: { videos?: Video[], channel?: Channel } } = {};
 
 
 function delayMessage(time) {
@@ -20,6 +25,8 @@ export class BotApp {
 
     constructor() {
         this.bot = new Telegraf(process.env.BOT_TOKEN);
+        this.bot.use(Telegraf.log());
+        this.onNextButtonClick();
         this.onText();
     }
 
@@ -29,6 +36,42 @@ export class BotApp {
 
     stop(reason: string) {
         this.bot.stop(reason);
+    }
+
+    onNextButtonClick() {
+        this.bot.action('random_more', async (ctx) => {
+            const chatId = ctx.callbackQuery.from.id;
+
+            if (!deprecatedState[chatId]) {
+                return ctx.reply('Search your channel again');
+            }
+
+            const { videos } = deprecatedState[chatId];
+            const { telegram } = ctx;
+
+            const randomVideos = await asyncFilter(getRandomItemsFromArray(videos, 10), this.validateVideo);
+            const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = randomVideos.map((video) => ({
+                caption: video.title + '\n\n' + video.watchUrl,
+                media: video.thumbnail,
+                type: 'photo',
+            }));
+
+            ctx.state.videos = videos;
+            deprecatedState[chatId].videos = videos;
+
+            const moreButton = () => ctx.reply('You can fetch 10 more videos. Press the more button below', Markup.inlineKeyboard([
+                {
+                    text: '🔍 More 10 videos',
+                    callback_data: 'random_more',
+                },
+            ]));
+
+            telegram.sendDice(chatId)
+                .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
+                .then(delayMessage(2000))
+                .then(() => ctx.replyWithMediaGroup(mediaGroup))
+                .then(moreButton);
+        });
     }
 
     onText() {
@@ -75,6 +118,8 @@ export class BotApp {
         const { telegram } = ctx;
         const chatId = ctx.message.from.id;
         ctx.state.channel = channel;
+        deprecatedState[chatId] = {};
+        deprecatedState[chatId].channel = channel;
 
         const channelData = {
             thumbnail: channel.thumbnail,
@@ -107,12 +152,23 @@ export class BotApp {
             type: 'photo',
         }));
 
+        ctx.state.videos = videos;
+        deprecatedState[chatId].videos = videos;
+
+        const moreButton = () => ctx.reply('You can fetch 10 more videos. Press the more button below', Markup.inlineKeyboard([
+            {
+                text: '🔍 More 10 videos',
+                callback_data: 'random_more',
+            },
+        ]));
+
         ctx.reply(botLocalesEn.fetchAllVideos(videos.length))
             .then(delayMessage(2000))
             .then(() => telegram.sendDice(chatId))
             .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
             .then(delayMessage(2000))
-            .then(() => ctx.replyWithMediaGroup(mediaGroup));
+            .then(() => ctx.replyWithMediaGroup(mediaGroup))
+            .then(moreButton);
     }
 
     async validateVideo(video: Video) {
