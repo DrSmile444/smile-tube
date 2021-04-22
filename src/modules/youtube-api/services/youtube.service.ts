@@ -45,8 +45,8 @@ export class YoutubeService {
             videos.unshift(...addedVideos);
             let isAllUpdated = storageService.checkFetchedVideos(fetchedVideos, channelVideos.videos);
 
-            for (let page = 2; nextContinuation; page++) {
-                if (isAllUpdated) {
+            for (let page = 2; nextContinuation || isAllUpdated; page++) {
+                if (isAllUpdated || addedVideos.length < channelVideos.videos.length) {
                     console.log('! All new videos fetched!');
                     stream$.next({
                         type: FetchActionType.FETCH_END,
@@ -113,6 +113,18 @@ export class YoutubeService {
             const continuationItems = await this.youtubeApiService.fetchContinuation(nextContinuation);
             videos.push(...continuationItems.videos);
             nextContinuation = continuationItems.nextContinuation;
+
+            if (!nextContinuation) {
+                stream$.next({
+                    type: FetchActionType.FETCH_END,
+                    payload: {
+                        channel,
+                        videos: storageService.updateFetchedVideos(channel.title, videos),
+                    },
+                });
+                stream$.complete();
+                break;
+            }
 
             if (page % 3 === 0) {
                 stream$.next({
