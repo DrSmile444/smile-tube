@@ -1,9 +1,11 @@
+import axios from 'axios';
 import { Telegraf } from 'telegraf';
 import { Context } from 'telegraf/src/context';
 import * as tg from 'telegraf/src/core/types/typegram';
 import * as tt from 'telegraf/src/telegram-types';
 
-import { FetchAction, FetchActionPayload, FetchActionType, youtubeService } from '../youtube-api';
+import { asyncFilter } from '../../utils';
+import { FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../youtube-api';
 import { botLocalesEn } from './locales/bot_en';
 import { getRandomItemsFromArray } from './utils';
 require('dotenv').config();
@@ -92,20 +94,18 @@ export class BotApp {
         ctx.reply(botLocalesEn.fetchVideo(channel.videoCount, videos.length));
     }
 
-    onFetchEnd(ctx: Context, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
+    async onFetchEnd(ctx: Context, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
         const { telegram } = ctx;
         const chatId = ctx.message.from.id;
 
         // @ts-ignore
         const { videos } = action.payload as FetchActionPayload<FetchActionType.FETCH_END>;
-        const randomVideos = getRandomItemsFromArray(videos, 10);
+        const randomVideos = await asyncFilter(getRandomItemsFromArray(videos, 10), this.validateVideo);
         const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = randomVideos.map((video) => ({
             caption: video.title + '\n\n' + video.watchUrl,
             media: video.thumbnail,
             type: 'photo',
         }));
-
-        console.log(mediaGroup);
 
         ctx.reply(botLocalesEn.fetchAllVideos(videos.length))
             .then(delayMessage(2000))
@@ -113,6 +113,15 @@ export class BotApp {
             .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
             .then(delayMessage(2000))
             .then(() => ctx.replyWithMediaGroup(mediaGroup));
+    }
+
+    async validateVideo(video: Video) {
+        try {
+            await axios.get(video.thumbnail);
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 
     onError(ctx: Context, action: FetchActionPayload<FetchActionType.ERROR>) {

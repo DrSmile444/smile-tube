@@ -27,7 +27,7 @@ export function getRandomIntArray(min, max, count) {
     return numberArray;
 }
 
-export function getRandomItemsFromArray(array, count) {
+export function getRandomItemsFromArray<T>(array: T[], count: number): T[] {
     const min = 0;
     const max = array.length - 1;
     const randomIndexes = getRandomIntArray(min, max, count);
