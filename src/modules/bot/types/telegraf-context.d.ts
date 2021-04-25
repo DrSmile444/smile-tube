@@ -1,11 +1,11 @@
-import { I18n } from '@edjopato/telegraf-i18n';
+import { TemplateData } from '@edjopato/telegraf-i18n/dist/source/types';
 import { Context, NarrowedContext } from 'telegraf';
 
 import { Channel, Video } from '../../youtube-api';
-import { Language } from '../interfaces';
+import { I18nOverride, Language } from '../interfaces';
 
 export type ContextMessageUpdate = {
-    i18n: I18n;
+    i18n: I18nOverride;
     scene: any;
     session: {
         channel?: Channel;
