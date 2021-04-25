@@ -1,19 +1,19 @@
+import { I18n } from '@edjopato/telegraf-i18n';
 import axios from 'axios';
+import * as path from 'path';
 import { Markup, Telegraf } from 'telegraf';
+import { ContextMessageUpdate } from 'telegraf-context';
+import * as LocalSession from 'telegraf-session-local';
 import { Context } from 'telegraf/src/context';
 import * as tg from 'telegraf/src/core/types/typegram';
 import * as tt from 'telegraf/src/telegram-types';
 
 import { asyncFilter } from '../../utils';
-import { Channel, FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../youtube-api';
+import { FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../youtube-api';
 import { botLocalesEn } from './locales/bot_en';
+import { getUserInfo } from './middlewares';
 import { getRandomItemsFromArray } from './utils';
 require('dotenv').config();
-
-/**
- * @deprecated
- * */
-const deprecatedState: { [key: number]: { videos?: Video[], channel?: Channel } } = {};
 
 
 function delayMessage(time) {
@@ -25,7 +25,21 @@ export class BotApp {
 
     constructor() {
         this.bot = new Telegraf(process.env.BOT_TOKEN);
+
+        // @ts-ignore
+        const i18n = new I18n({
+            defaultLanguage: 'en',
+            directory: path.resolve(__dirname, 'locales'),
+            useSession: true,
+            sessionName: 'session',
+        });
+
+        const session = new LocalSession({ database: 'example_db.json' });
+
         this.bot.use(Telegraf.log());
+        this.bot.use(session.middleware());
+        this.bot.use(i18n.middleware());
+        this.bot.use(getUserInfo);
         this.onNextButtonClick();
         this.onText();
     }
@@ -39,14 +53,15 @@ export class BotApp {
     }
 
     onNextButtonClick() {
-        this.bot.action('random_more', async (ctx) => {
+        this.bot.action('random_more', async (ctx: ContextMessageUpdate) => {
             const chatId = ctx.callbackQuery.from.id;
 
-            if (!deprecatedState[chatId]) {
-                return ctx.reply('Search your channel again');
+            if (!ctx.session.videos) {
+                // @ts-ignore
+                return ctx.reply(ctx.i18n.t('scenes.errors.botReset'));
             }
 
-            const { videos } = deprecatedState[chatId];
+            const { videos } = ctx.session;
             const { telegram } = ctx;
 
             const randomVideos = await asyncFilter(getRandomItemsFromArray(videos, 10), this.validateVideo);
@@ -56,8 +71,7 @@ export class BotApp {
                 type: 'photo',
             }));
 
-            ctx.state.videos = videos;
-            deprecatedState[chatId].videos = videos;
+            ctx.session.videos = videos;
 
             const moreButton = () => ctx.reply('You can fetch 10 more videos. Press the more button below', Markup.inlineKeyboard([
                 {
@@ -113,13 +127,11 @@ export class BotApp {
         });
     }
 
-    onFoundChannel(ctx: Context, action: FetchAction<FetchActionType.FOUND_CHANNEL>) {
+    onFoundChannel(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.FOUND_CHANNEL>) {
         const { channel } = action.payload;
         const { telegram } = ctx;
         const chatId = ctx.message.from.id;
-        ctx.state.channel = channel;
-        deprecatedState[chatId] = {};
-        deprecatedState[chatId].channel = channel;
+        ctx.session.channel = channel;
 
         const channelData = {
             thumbnail: channel.thumbnail,
@@ -132,14 +144,14 @@ export class BotApp {
         telegram.sendPhoto(chatId, channelData.thumbnail, channelData.options);
     }
 
-    onVideosFetched(ctx: Context, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
-        const { channel } = ctx.state;
+    onVideosFetched(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
+        const { channel } = ctx.session;
         const { videos } = action.payload;
 
         ctx.reply(botLocalesEn.fetchVideo(channel.videoCount, videos.length));
     }
 
-    async onFetchEnd(ctx: Context, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
+    async onFetchEnd(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
         const { telegram } = ctx;
         const chatId = ctx.message.from.id;
 
@@ -152,8 +164,7 @@ export class BotApp {
             type: 'photo',
         }));
 
-        ctx.state.videos = videos;
-        deprecatedState[chatId].videos = videos;
+        ctx.session.videos = videos;
 
         const moreButton = () => ctx.reply('You can fetch 10 more videos. Press the more button below', Markup.inlineKeyboard([
             {

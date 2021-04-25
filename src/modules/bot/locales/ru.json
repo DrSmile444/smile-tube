@@ -1,0 +1,16 @@
+{
+  "scenes": {
+    "start": {
+      "welcome": "\uD83D\uDC4B Привет, @${username}!\n\uD83D\uDD0D Поиск переданного канала\n\n*${message}*"
+    },
+    "shared": {
+      "foundChannel": "\uD83D\uDD0D Найден канал!\n*${title}* с *${videoCount}* видео.",
+      "fetchVideoProgress": "Загружено ${fetchedCount} из ${videoCount} видео...",
+      "fetchedAllVideos": "Готово! Загружено ${videoCount} видео.\nНаходим рандомные видео..."
+    },
+    "errors": {
+      "botReset": "Найдите ваш канал снова, пожалуйста!",
+      "notFound": "Не могу найти ${title} канал. Пожалуйста, попробуйте другой"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "scenes": {
+    "start": {
+      "welcome": "\uD83D\uDC4B Hello, @${username}!\n\uD83D\uDD0D Searching for a passed channel\n\n*${message}*"
+    },
+    "shared": {
+      "foundChannel": "\uD83D\uDD0D Found the channel!\n*${title}* with *${videoCount}* videos.",
+      "fetchVideoProgress": "Fetched ${fetchedCount} of ${videoCount} videos...",
+      "fetchedAllVideos": "Done! Fetched last ${videoCount} videos.\nFinding random videos..."
+    },
+    "errors": {
+      "botReset": "Search your channel again, please!",
+      "notFound": "Cannot find ${title} channel. Please, try another"
+    }
+  }
+}
