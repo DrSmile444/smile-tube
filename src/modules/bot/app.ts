@@ -137,7 +137,7 @@ export class BotApp {
             thumbnail: channel.thumbnail,
             options: {
                 parse_mode: 'Markdown',
-                caption: ctx.i18n.t('scenes.errors.notFound', { title, videoCount }),
+                caption: ctx.i18n.t('scenes.shared.foundChannel', { title, videoCount }),
             } as tt.ExtraPhoto,
         };
 
