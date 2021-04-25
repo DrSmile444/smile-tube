@@ -3,8 +3,8 @@
   "scenes.shared.foundChannel": "🔍 Найден канал!\n*${title}* с *${videoCount}* видео.",
   "scenes.shared.fetchVideoProgress": "Загружено ${fetchedCount} из ${videoCount} видео...",
   "scenes.shared.fetchedAllVideos": "Готово! Загружено ${videoCount} видео.\nНаходим рандомные видео...",
-  "scenes.shared.fetchMoreTitle": "You can fetch 10 more videos. Press the more button below",
-  "scenes.shared.fetchMoreButton": "🔍 More 10 videos",
+  "scenes.shared.fetchMoreTitle": "Вы можете загрузить ещё 10 видео. Нажмите кнопку ещё ниже",
+  "scenes.shared.fetchMoreButton": "🔍 Ещё 10 видео",
   "scenes.errors.botReset": "Найдите ваш канал снова, пожалуйста!",
   "scenes.errors.notFound": "Не могу найти ${message} канал. Пожалуйста, попробуйте другой"
 }
