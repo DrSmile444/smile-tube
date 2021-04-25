@@ -4,13 +4,11 @@ import * as path from 'path';
 import { Markup, Telegraf } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
 import * as LocalSession from 'telegraf-session-local';
-import { Context } from 'telegraf/src/context';
 import * as tg from 'telegraf/src/core/types/typegram';
 import * as tt from 'telegraf/src/telegram-types';
 
 import { asyncFilter } from '../../utils';
 import { FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../youtube-api';
-import { botLocalesEn } from './locales/bot_en';
 import { getUserInfo } from './middlewares';
 import { getRandomItemsFromArray } from './utils';
 require('dotenv').config();
@@ -19,6 +17,13 @@ require('dotenv').config();
 function delayMessage(time) {
     return () => new Promise((resolve) => setTimeout(resolve, time));
 }
+
+const moreButton = (ctx: ContextMessageUpdate) => () => ctx.reply(ctx.i18n.t('scenes.shared.fetchMoreTitle'), Markup.inlineKeyboard([
+    {
+        text: ctx.i18n.t('scenes.shared.fetchMoreButton'),
+        callback_data: 'random_more',
+    },
+]));
 
 export class BotApp {
     private bot: Telegraf;
@@ -73,29 +78,22 @@ export class BotApp {
 
             ctx.session.videos = videos;
 
-            const moreButton = () => ctx.reply('You can fetch 10 more videos. Press the more button below', Markup.inlineKeyboard([
-                {
-                    text: '🔍 More 10 videos',
-                    callback_data: 'random_more',
-                },
-            ]));
-
             telegram.sendDice(chatId)
                 .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
                 .then(delayMessage(2000))
                 .then(() => ctx.replyWithMediaGroup(mediaGroup))
-                .then(moreButton);
+                .then(moreButton(ctx));
         });
     }
 
     onText() {
-        this.bot.on('text', async (ctx) => {
+        this.bot.on('text', async (ctx: ContextMessageUpdate) => {
             const chatId = ctx.message.from.id;
             const username = ctx.update.message.from.username;
             const message = ctx.message.text;
             const { telegram } = ctx;
 
-            ctx.reply(botLocalesEn.welcome(username, message), { parse_mode: 'Markdown' })
+            ctx.reply(ctx.i18n.t('scenes.start.welcome', { username, message }), { parse_mode: 'Markdown' })
                 .then(() => telegram.sendChatAction(chatId, 'typing'));
 
             try {
@@ -121,7 +119,7 @@ export class BotApp {
                     });
             } catch (e) {
                 console.error(e);
-                ctx.reply(botLocalesEn.error(message));
+                ctx.reply(ctx.i18n.t('scenes.errors.notFound', { message }));
                 ctx.reply(e);
             }
         });
@@ -133,11 +131,13 @@ export class BotApp {
         const chatId = ctx.message.from.id;
         ctx.session.channel = channel;
 
+        const { title, videoCount } = channel;
+
         const channelData = {
             thumbnail: channel.thumbnail,
             options: {
                 parse_mode: 'Markdown',
-                caption: botLocalesEn.foundChannel(channel.title, channel.videoCount),
+                caption: ctx.i18n.t('scenes.errors.notFound', { title, videoCount }),
             } as tt.ExtraPhoto,
         };
 
@@ -148,7 +148,7 @@ export class BotApp {
         const { channel } = ctx.session;
         const { videos } = action.payload;
 
-        ctx.reply(botLocalesEn.fetchVideo(channel.videoCount, videos.length));
+        ctx.reply(ctx.i18n.t('scenes.shared.fetchVideoProgress', { fetchedCount: channel.videoCount, videoCount: videos.length }));
     }
 
     async onFetchEnd(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
@@ -166,20 +166,13 @@ export class BotApp {
 
         ctx.session.videos = videos;
 
-        const moreButton = () => ctx.reply('You can fetch 10 more videos. Press the more button below', Markup.inlineKeyboard([
-            {
-                text: '🔍 More 10 videos',
-                callback_data: 'random_more',
-            },
-        ]));
-
-        ctx.reply(botLocalesEn.fetchAllVideos(videos.length))
+        ctx.reply(ctx.i18n.t('scenes.shared.fetchedAllVideos', { videoCount: videos.length }))
             .then(delayMessage(2000))
             .then(() => telegram.sendDice(chatId))
             .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
             .then(delayMessage(2000))
             .then(() => ctx.replyWithMediaGroup(mediaGroup))
-            .then(moreButton);
+            .then(moreButton(ctx));
     }
 
     async validateVideo(video: Video) {
@@ -191,10 +184,10 @@ export class BotApp {
         }
     }
 
-    onError(ctx: Context, action: FetchActionPayload<FetchActionType.ERROR>) {
+    onError(ctx: ContextMessageUpdate, action: FetchActionPayload<FetchActionType.ERROR>) {
         const message = (ctx.message as any).text;
         const { error } = action;
-        ctx.reply(botLocalesEn.error(message)).then(() => ctx.reply(error && error.message || String(error)));
+        ctx.reply(ctx.i18n.t('scenes.errors.notFound', { message })).then(() => ctx.reply(error && error.message || String(error)));
     }
 }
 

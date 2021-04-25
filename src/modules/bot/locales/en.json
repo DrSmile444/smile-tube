@@ -6,11 +6,13 @@
     "shared": {
       "foundChannel": "\uD83D\uDD0D Found the channel!\n*${title}* with *${videoCount}* videos.",
       "fetchVideoProgress": "Fetched ${fetchedCount} of ${videoCount} videos...",
-      "fetchedAllVideos": "Done! Fetched last ${videoCount} videos.\nFinding random videos..."
+      "fetchedAllVideos": "Done! Fetched last ${videoCount} videos.\nFinding random videos...",
+      "fetchMoreTitle": "You can fetch 10 more videos. Press the more button below",
+      "fetchMoreButton": "🔍 More 10 videos"
     },
     "errors": {
       "botReset": "Search your channel again, please!",
-      "notFound": "Cannot find ${title} channel. Please, try another"
+      "notFound": "Cannot find ${message} channel. Please, try another"
     }
   }
 }
