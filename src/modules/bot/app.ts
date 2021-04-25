@@ -39,7 +39,7 @@ export class BotApp {
             sessionName: 'session',
         });
 
-        const session = new LocalSession({ database: 'example_db.json' });
+        const session = new LocalSession({ database: 'local.db.json' });
 
         this.bot.use(Telegraf.log());
         this.bot.use(session.middleware());

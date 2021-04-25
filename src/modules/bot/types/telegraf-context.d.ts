@@ -1,4 +1,3 @@
-import { TemplateData } from '@edjopato/telegraf-i18n/dist/source/types';
 import { Context, NarrowedContext } from 'telegraf';
 
 import { Channel, Video } from '../../youtube-api';

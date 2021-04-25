@@ -2,3 +2,5 @@ node_modules
 debug
 .idea
 .env
+
+local.db.json
