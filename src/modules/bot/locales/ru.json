@@ -1,18 +1,10 @@
 {
-  "scenes": {
-    "start": {
-      "welcome": "\uD83D\uDC4B Привет, @${username}!\n\uD83D\uDD0D Поиск переданного канала\n\n*${message}*"
-    },
-    "shared": {
-      "foundChannel": "\uD83D\uDD0D Найден канал!\n*${title}* с *${videoCount}* видео.",
-      "fetchVideoProgress": "Загружено ${fetchedCount} из ${videoCount} видео...",
-      "fetchedAllVideos": "Готово! Загружено ${videoCount} видео.\nНаходим рандомные видео...",
-      "fetchMoreTitle": "You can fetch 10 more videos. Press the more button below",
-      "fetchMoreButton": "🔍 More 10 videos"
-    },
-    "errors": {
-      "botReset": "Найдите ваш канал снова, пожалуйста!",
-      "notFound": "Не могу найти ${message} канал. Пожалуйста, попробуйте другой"
-    }
-  }
+  "scenes.start.welcome": "👋 Привет, @${username}!\n🔍 Поиск переданного канала\n\n*${message}*",
+  "scenes.shared.foundChannel": "🔍 Найден канал!\n*${title}* с *${videoCount}* видео.",
+  "scenes.shared.fetchVideoProgress": "Загружено ${fetchedCount} из ${videoCount} видео...",
+  "scenes.shared.fetchedAllVideos": "Готово! Загружено ${videoCount} видео.\nНаходим рандомные видео...",
+  "scenes.shared.fetchMoreTitle": "You can fetch 10 more videos. Press the more button below",
+  "scenes.shared.fetchMoreButton": "🔍 More 10 videos",
+  "scenes.errors.botReset": "Найдите ваш канал снова, пожалуйста!",
+  "scenes.errors.notFound": "Не могу найти ${message} канал. Пожалуйста, попробуйте другой"
 }
