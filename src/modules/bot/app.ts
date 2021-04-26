@@ -8,7 +8,7 @@ import * as LocalSession from 'telegraf-session-local';
 import * as tg from 'telegraf/src/core/types/typegram';
 import * as tt from 'telegraf/src/telegram-types';
 
-import { asyncFilter } from '../../utils';
+import { asyncMap } from '../../utils';
 import { FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../youtube-api';
 import { getUserInfo } from './middlewares';
 import { getRandomItemsFromArray } from './utils';
@@ -86,7 +86,7 @@ export class BotApp {
             const { videos } = ctx.session;
             const { telegram } = ctx;
 
-            const randomVideos = await asyncFilter(getRandomItemsFromArray(videos, 10), this.validateVideo);
+            const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), (video) => this.validateVideo(ctx, video));
             const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, randomVideos);
 
             ctx.session.videos = videos;
@@ -170,7 +170,7 @@ export class BotApp {
 
         // @ts-ignore
         const { videos } = action.payload as FetchActionPayload<FetchActionType.FETCH_END>;
-        const randomVideos = await asyncFilter(getRandomItemsFromArray(videos, 10), this.validateVideo);
+        const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), (video) => this.validateVideo(ctx, video));
         const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, randomVideos);
 
         ctx.session.videos = videos;
@@ -184,12 +184,33 @@ export class BotApp {
             .then(moreButton(ctx));
     }
 
-    async validateVideo(video: Video) {
+    async validateVideo(ctx: ContextMessageUpdate, video: Video): Promise<Video> {
         try {
-            await axios.get(video.thumbnail);
-            return true;
+            /**
+             * Telegram cannot fetch some video previews and breaks the app.
+             * To solve this issue, we're using mq previews instead
+             * */
+            await axios.get(`https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`);
+
+            return {
+                ...video,
+                thumbnail: `https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`,
+            };
         } catch (e) {
-            return false;
+            try {
+                await axios.get(video.thumbnail);
+
+                console.log('*** NOTE: Using hqdefault with creds for https://www.youtube.com/watch?v=' + video.videoId);
+
+                return video;
+            } catch (e) {
+                console.log('*** NOTE: Using deleted video for https://www.youtube.com/watch?v=' + video.videoId);
+
+                return {
+                    ...video,
+                    thumbnail: `https://netstorage-tuko.akamaized.net/images/f66b622c39634a2c.jpg`,
+                };
+            }
         }
     }
 
