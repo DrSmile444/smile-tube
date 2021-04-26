@@ -7,7 +7,7 @@ import { BaseScene } from 'telegraf/typings/scenes';
 import { asyncMap } from '../../../../utils';
 import { FetchAction, FetchActionPayload, FetchActionType, youtubeService } from '../../../youtube-api';
 import { getRandomItemsFromArray } from '../../utils';
-import { delayMessage, getMediaGroup, moreButton, validateVideo } from './search-random.helper';
+import { addFetchedChannel, delayMessage, getMediaGroup, moreButton, validateVideo } from './search-random.helper';
 
 
 export class SearchRandomHelper {
@@ -84,7 +84,9 @@ export class SearchRandomHelper {
         const { channel } = action.payload;
         const { telegram } = ctx;
         const chatId = ctx.message.from.id;
+
         ctx.session.channel = channel;
+        addFetchedChannel(ctx, channel);
 
         const { title, videoCount } = channel;
 

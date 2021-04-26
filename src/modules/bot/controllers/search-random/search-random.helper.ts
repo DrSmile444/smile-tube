@@ -4,7 +4,7 @@ import { Markup } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
 import * as tg from 'telegraf/src/core/types/typegram';
 
-import { Video } from '../../../youtube-api';
+import { Channel, Video } from '../../../youtube-api';
 
 
 export function delayMessage(time) {
@@ -66,4 +66,17 @@ export async function validateVideo(video: Video): Promise<Video> {
             };
         }
     }
+}
+
+export function addFetchedChannel(ctx: ContextMessageUpdate, channel: Channel) {
+    if (!ctx.session.searchedChannels) {
+        ctx.session.searchedChannels = [];
+    }
+
+    const newSearchedChannels = ctx.session.searchedChannels
+        .filter((searchedChannel) => searchedChannel.channelId !== channel.channelId)
+
+    newSearchedChannels.unshift(channel);
+
+    ctx.session.searchedChannels = newSearchedChannels;
 }

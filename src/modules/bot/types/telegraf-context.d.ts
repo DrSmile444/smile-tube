@@ -7,6 +7,7 @@ export type ContextMessageUpdate = {
     i18n: I18nOverride;
     scene: any;
     session: {
+        searchedChannels?: Channel[];
         channel?: Channel;
         videos?: Video[];
         settingsScene: {
