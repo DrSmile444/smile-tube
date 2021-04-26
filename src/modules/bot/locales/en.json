@@ -1,5 +1,8 @@
 {
-  "scenes.start.welcome": "👋 Hello, @${username}!\n🔍 Searching for a passed channel\n\n*${message}*",
+  "scenes.start.welcome": "Hello, @{username}! I'm Smile-Tube and I can help you to find random videos from you favorite channel.\n\nTo start using me, just press a button from the menu below",
+  "scenes.start.welcomeBack": "Welcome back, @${username}!",
+  "scenes.searchRandom.start": "Welcome to the random video searcher!\n*To start finding random videos, enter the channel name firstly.*",
+  "scenes.searchRandom.searchChannel": "\uD83D\uDD0D Searching for a passed channel\n\n*${message}*",
   "scenes.shared.foundChannel": "🔍 Found the channel!\n*${title}* with *${videoCount}* videos.",
   "scenes.shared.fetchVideoProgress": "Fetched ${fetchedCount} of ${videoCount} videos...",
   "scenes.shared.fetchedAllVideos": "Done! Fetched last ${videoCount} videos.\nFinding random videos...",
@@ -8,5 +11,8 @@
   "scenes.shared.viewsCount": "${views} views",
   "scenes.shared.duration": "${duration} duration",
   "scenes.errors.botReset": "Search your channel again, please!",
-  "scenes.errors.notFound": "Cannot find ${message} channel. Please, try another"
+  "scenes.errors.notFound": "Cannot find ${message} channel. Please, try another channel",
+  "shared.somethingWentWrong": "❌ Something went wrong. Please, try one more time...",
+  "shared.whatNext": "✋ What can we do next?",
+  "keyboards.mainKeyboard.searchRandom": "🔍 Search random 10 videos"
 }

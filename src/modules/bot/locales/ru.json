@@ -1,5 +1,8 @@
 {
-  "scenes.start.welcome": "👋 Привет, @${username}!\n🔍 Поиск переданного канала\n\n*${message}*",
+  "scenes.start.welcome": "Hello, @{username}! I'm Smile-Tube and I can help you to find random videos from you favorite channel.\n\nTo start using me, just press a button from the menu below",
+  "scenes.start.welcomeBack": "Добро пожаловать снова, @${username}!",
+  "scenes.searchRandom.start": "Welcome to the random video searcher!\n*To start finding random videos, enter the channel name firstly.*",
+  "scenes.searchRandom.searchChannel": "🔍 Поиск переданного канала\n\n*${message}*",
   "scenes.shared.foundChannel": "🔍 Найден канал!\n*${title}* с *${videoCount}* видео.",
   "scenes.shared.fetchVideoProgress": "Загружено ${fetchedCount} из ${videoCount} видео...",
   "scenes.shared.fetchedAllVideos": "Готово! Загружено ${videoCount} видео.\nНаходим рандомные видео...",
@@ -8,5 +11,8 @@
   "scenes.shared.viewsCount": "${views} просмотров",
   "scenes.shared.duration": "${duration} длительность",
   "scenes.errors.botReset": "Найдите ваш канал снова, пожалуйста!",
-  "scenes.errors.notFound": "Не могу найти ${message} канал. Пожалуйста, попробуйте другой"
+  "scenes.errors.notFound": "Не могу найти ${message} канал. Пожалуйста, попробуйте другой канал",
+  "shared.somethingWentWrong": "❌ Что-то пошло не так. Попробуйте ещё раз...",
+  "shared.whatNext": "✋ What can we do next?",
+  "keyboards.mainKeyboard.searchRandom": "🔍 Search random 10 videos"
 }
