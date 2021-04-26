@@ -18,12 +18,6 @@ startController.enter(async (ctx: ContextMessageUpdate) => {
     }
 });
 
-startController.leave(async (ctx: ContextMessageUpdate) => {
-    const { mainKeyboard } = getMainKeyboard(ctx);
-
-    await ctx.reply(ctx.i18n.t('shared.whatNext'), mainKeyboard);
-});
-
 startController.command('/leave', () => {
     Stage.leave();
 });
