@@ -86,7 +86,7 @@ export class BotApp {
             const { videos } = ctx.session;
             const { telegram } = ctx;
 
-            const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), (video) => this.validateVideo(ctx, video));
+            const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), this.validateVideo);
             const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, randomVideos);
 
             ctx.session.videos = videos;
@@ -170,7 +170,7 @@ export class BotApp {
 
         // @ts-ignore
         const { videos } = action.payload as FetchActionPayload<FetchActionType.FETCH_END>;
-        const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), (video) => this.validateVideo(ctx, video));
+        const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), this.validateVideo);
         const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, randomVideos);
 
         ctx.session.videos = videos;
@@ -184,7 +184,7 @@ export class BotApp {
             .then(moreButton(ctx));
     }
 
-    async validateVideo(ctx: ContextMessageUpdate, video: Video): Promise<Video> {
+    async validateVideo(video: Video): Promise<Video> {
         try {
             /**
              * Telegram cannot fetch some video previews and breaks the app.
