@@ -1,6 +1,6 @@
 {
   "scenes.start.welcome": "Hello, @{username}! I'm Smile-Tube and I can help you to find random videos from you favorite channel.\n\nTo start using me, just press a button from the menu below",
-  "scenes.start.welcomeBack": "Welcome back, @${username}!",
+  "scenes.start.welcomeBack": "Welcome back, @${username}!\nHow can I help you?",
   "scenes.searchRandom.start": "Welcome to the random video searcher!\n*To start finding random videos, enter the channel name firstly.*",
   "scenes.searchRandom.searchedChannelsList": "Last searched channels:",
   "scenes.searchRandom.searchChannel": "\uD83D\uDD0D Searching for a passed channel\n\n*${message}*",

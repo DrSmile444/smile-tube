@@ -1,8 +1,8 @@
 {
-  "scenes.start.welcome": "Hello, @{username}! I'm Smile-Tube and I can help you to find random videos from you favorite channel.\n\nTo start using me, just press a button from the menu below",
-  "scenes.start.welcomeBack": "Добро пожаловать снова, @${username}!",
-  "scenes.searchRandom.start": "Welcome to the random video searcher!\n*To start finding random videos, enter the channel name firstly.*",
-  "scenes.searchRandom.searchedChannelsList": "Last searched channels:",
+  "scenes.start.welcome": "Привет, @{username}! Я Smile-Tube и я могу помочь тебе найти рандомные видео с твоих любимых Youtube каналов.\n\nЧтобы начать использовать меня, просто нажми любую кнопку в меню снизу",
+  "scenes.start.welcomeBack": "Добро пожаловать снова, @${username}!\nЧем могу помочь?",
+  "scenes.searchRandom.start": "Добро пожаловать в рандомный поиск!\n*Чтобы начать находить рандомные видео, введи сначала имя канала.*",
+  "scenes.searchRandom.searchedChannelsList": "Последние искаемые каналы:",
   "scenes.searchRandom.searchChannel": "🔍 Поиск переданного канала\n\n*${message}*",
   "scenes.shared.foundChannel": "🔍 Найден канал!\n*${title}* с *${videoCount}* видео.",
   "scenes.shared.fetchVideoProgress": "Загружено ${fetchedCount} из ${videoCount} видео...",
@@ -14,7 +14,7 @@
   "scenes.errors.botReset": "Найдите ваш канал снова, пожалуйста!",
   "scenes.errors.notFound": "Не могу найти ${message} канал. Пожалуйста, попробуйте другой канал",
   "shared.somethingWentWrong": "❌ Что-то пошло не так. Попробуйте ещё раз...",
-  "shared.whatNext": "✋ What can we do next?",
-  "keyboards.mainKeyboard.searchRandom": "🔍 Search random 10 videos",
-  "keyboards.backKeyboard.back": "◀️ Back"
+  "shared.whatNext": "✋ Чем могу помочь дальше?",
+  "keyboards.mainKeyboard.searchRandom": "🔍 Найти 10 рандомных видео",
+  "keyboards.backKeyboard.back": "◀️ Назад"
 }
