@@ -14,5 +14,6 @@
   "scenes.errors.notFound": "Не могу найти ${message} канал. Пожалуйста, попробуйте другой канал",
   "shared.somethingWentWrong": "❌ Что-то пошло не так. Попробуйте ещё раз...",
   "shared.whatNext": "✋ What can we do next?",
-  "keyboards.mainKeyboard.searchRandom": "🔍 Search random 10 videos"
+  "keyboards.mainKeyboard.searchRandom": "🔍 Search random 10 videos",
+  "keyboards.backKeyboard.back": "◀️ Back"
 }
