@@ -7,53 +7,49 @@ import { BaseScene } from 'telegraf/typings/scenes';
 import { asyncMap } from '../../../../utils';
 import { FetchAction, FetchActionPayload, FetchActionType, youtubeService } from '../../../youtube-api';
 import { getRandomItemsFromArray } from '../../utils';
-import { addFetchedChannel, delayMessage, getMediaGroup, moreButton, validateVideo } from './search-random.helper';
+import { addFetchedChannel, delayMessage, getCtxInfo, getMediaGroup, moreButton, validateVideo } from './search-random.helper';
 
 
-export class SearchRandomHelper {
+export class SearchRandomService {
     scene: BaseScene<Context<any>>;
 
     constructor(scene: BaseScene<Context<any>>) {
         this.scene = scene;
     }
 
-    onText() {
-        this.scene.on('text', async (ctx: ContextMessageUpdate) => {
-            const chatId = ctx.message.from.id;
-            const username = ctx.update.message.from.username;
-            const message = ctx.message.text;
-            const { telegram } = ctx;
+    onText(ctx: ContextMessageUpdate, message = ctx.message.text) {
+        const { chatId, username } = getCtxInfo(ctx);
+        const { telegram } = ctx;
 
-            ctx.reply(ctx.i18n.t('scenes.searchRandom.searchChannel', { username, message }), { parse_mode: 'Markdown' })
-                .then(() => telegram.sendChatAction(chatId, 'typing'));
+        ctx.reply(ctx.i18n.t('scenes.searchRandom.searchChannel', { username, message }), { parse_mode: 'Markdown' })
+            .then(() => telegram.sendChatAction(chatId, 'typing'));
 
-            try {
-                youtubeService.updateChannelVideosList(message)
-                    .subscribe((action: FetchAction) => {
-                        switch (action.type) {
-                            case FetchActionType.FOUND_CHANNEL:
-                                this.onFoundChannel(ctx, action as any);
-                                break;
+        try {
+            youtubeService.updateChannelVideosList(message)
+                .subscribe((action: FetchAction) => {
+                    switch (action.type) {
+                        case FetchActionType.FOUND_CHANNEL:
+                            this.onFoundChannel(ctx, action as any);
+                            break;
 
-                            case FetchActionType.VIDEOS_FETCHED:
-                                this.onVideosFetched(ctx, action as any);
-                                break;
+                        case FetchActionType.VIDEOS_FETCHED:
+                            this.onVideosFetched(ctx, action as any);
+                            break;
 
-                            case FetchActionType.FETCH_END:
-                                this.onFetchEnd(ctx, action as any);
-                                break;
+                        case FetchActionType.FETCH_END:
+                            this.onFetchEnd(ctx, action as any);
+                            break;
 
-                            case FetchActionType.ERROR:
-                                this.onError(ctx, action as any);
-                                break;
-                        }
-                    });
-            } catch (e) {
-                console.error(e);
-                ctx.reply(ctx.i18n.t('scenes.errors.notFound', { message }));
-                ctx.reply(e);
-            }
-        });
+                        case FetchActionType.ERROR:
+                            this.onError(ctx, action as any);
+                            break;
+                    }
+                });
+        } catch (e) {
+            console.error(e);
+            ctx.reply(ctx.i18n.t('scenes.errors.notFound', { message }));
+            ctx.reply(e);
+        }
     }
 
     onNextButtonClick() {
@@ -83,7 +79,7 @@ export class SearchRandomHelper {
     onFoundChannel(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.FOUND_CHANNEL>) {
         const { channel } = action.payload;
         const { telegram } = ctx;
-        const chatId = ctx.message.from.id;
+        const { chatId } = getCtxInfo(ctx);
 
         ctx.session.channel = channel;
         addFetchedChannel(ctx, channel);
@@ -110,7 +106,7 @@ export class SearchRandomHelper {
 
     async onFetchEnd(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
         const { telegram } = ctx;
-        const chatId = ctx.message.from.id;
+        const { chatId } = getCtxInfo(ctx);
 
         const { videos } = action.payload;
         const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), validateVideo);
@@ -128,7 +124,7 @@ export class SearchRandomHelper {
     }
 
     onError(ctx: ContextMessageUpdate, action: FetchActionPayload<FetchActionType.ERROR>) {
-        const message = (ctx.message as any).text;
+        const { message } = getCtxInfo(ctx);
         const { error } = action;
         ctx.reply(ctx.i18n.t('scenes.errors.notFound', { message })).then(() => ctx.reply(error && error.message || String(error)));
     }

@@ -18,6 +18,39 @@ export const moreButton = (ctx: ContextMessageUpdate) => () => ctx.reply(ctx.i18
     },
 ]));
 
+export function getCtxInfo(ctx: ContextMessageUpdate) {
+    const { id, username } = ctx.message && ctx.message.from || ctx.update.callback_query.from;
+    const message = ctx.message && ctx.message.text || JSON.parse(ctx.update.callback_query.data).p;
+
+    return {
+        chatId: id,
+        username,
+        message,
+    };
+}
+
+export function getSearchedChannelsButtons(ctx: ContextMessageUpdate, channels: Channel[] | undefined) {
+    if (!channels || channels.length === 0) {
+        return {};
+    }
+
+    const buttons = channels.map((channel) => {
+        return Markup.button.callback(
+            channel.title,
+            JSON.stringify({ a: 'searchChannel', p: channel.title }),
+            false,
+        );
+    });
+
+    return Markup.inlineKeyboard(
+        [
+           buttons.slice(0, 3),
+           buttons.slice(3, 6),
+           buttons.slice(6, 9),
+        ],
+    );
+}
+
 export const getMediaGroup = (ctx: ContextMessageUpdate, videos: Video[]): ReadonlyArray<tg.InputMediaPhoto> => videos.map((video) => ({
     caption: [
         '<b>' + video.title + '</b>',
