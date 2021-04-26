@@ -13,6 +13,7 @@ export type ContextMessageUpdate = {
             messagesToDelete: any[];
         };
         language: Language;
+        __language_code: Language;
     };
     webhookReply: boolean;
     // @ts-ignore

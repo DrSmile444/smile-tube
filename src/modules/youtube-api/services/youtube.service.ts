@@ -43,7 +43,7 @@ export class YoutubeService {
                 .filter((video) => !fetchedVideos.some((fetchedVideo) => fetchedVideo.videoId === video.videoId));
 
             videos.unshift(...addedVideos);
-            let isAllUpdated = storageService.checkFetchedVideos(fetchedVideos, channelVideos.videos);
+            let isAllUpdated = channelVideos.videos.length < 30 || storageService.checkFetchedVideos(fetchedVideos, channelVideos.videos);
 
             for (let page = 2; nextContinuation || isAllUpdated; page++) {
                 if (isAllUpdated || addedVideos.length < channelVideos.videos.length) {
@@ -97,8 +97,10 @@ export class YoutubeService {
             console.log('! Fetching videos with limit:', videosCount);
         }
 
-        for (let page = 2; nextContinuation; page++) {
-            if (videosCount && videosCount <= videos.length) {
+        const isAllFetched = channel.videoCount <= 30;
+
+        for (let page = 2; nextContinuation || isAllFetched; page++) {
+            if (isAllFetched || videosCount && videosCount <= videos.length) {
                 stream$.next({
                     type: FetchActionType.FETCH_END,
                     payload: {

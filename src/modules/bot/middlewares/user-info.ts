@@ -1,4 +1,5 @@
 
+import * as moment from 'moment';
 import { ContextMessageUpdate } from 'telegraf-context';
 
 import { Language } from '../interfaces';
@@ -10,8 +11,12 @@ import { Language } from '../interfaces';
  */
 export const getUserInfo = async (ctx: ContextMessageUpdate, next: Function) => {
     if (!ctx.session.language) {
+        const messageLang = ctx.message &&
+            ctx.message.from &&
+            ctx.message.from.language_code;
+
         const user = {
-            language: ctx.update.callback_query.from.language_code as Language,
+            language: messageLang || ctx.update.callback_query.from.language_code as Language,
         };
 
         if (user) {
@@ -20,6 +25,8 @@ export const getUserInfo = async (ctx: ContextMessageUpdate, next: Function) => 
             ctx.i18n.locale(user.language);
         }
     }
+
+    moment.locale(ctx.session.__language_code);
 
     return next();
 };

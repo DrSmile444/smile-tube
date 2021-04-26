@@ -5,6 +5,8 @@
   "scenes.shared.fetchedAllVideos": "Done! Fetched last ${videoCount} videos.\nFinding random videos...",
   "scenes.shared.fetchMoreTitle": "You can fetch 10 more videos. Press the more button below",
   "scenes.shared.fetchMoreButton": "🔍 More 10 videos",
+  "scenes.shared.viewsCount": "${views} views",
+  "scenes.shared.duration": "${duration} duration",
   "scenes.errors.botReset": "Search your channel again, please!",
   "scenes.errors.notFound": "Cannot find ${message} channel. Please, try another"
 }

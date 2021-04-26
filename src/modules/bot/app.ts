@@ -1,5 +1,6 @@
 import { I18n } from '@edjopato/telegraf-i18n';
 import axios from 'axios';
+import * as moment from 'moment';
 import * as path from 'path';
 import { Markup, Telegraf } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
@@ -24,6 +25,22 @@ const moreButton = (ctx: ContextMessageUpdate) => () => ctx.reply(ctx.i18n.t('sc
         callback_data: 'random_more',
     },
 ]));
+
+const getMediaGroup = (ctx: ContextMessageUpdate, videos: Video[]): ReadonlyArray<tg.InputMediaPhoto> => videos.map((video) => ({
+    caption: [
+        '<b>' + video.title + '</b>',
+        '* ' + [
+            ctx.i18n.t('scenes.shared.duration', { duration: video.duration }),
+            ctx.i18n.t('scenes.shared.viewsCount', { views: video.viewCountText }),
+            moment(video.publishedTime).fromNow(),
+        ].join(' * '),
+        '',
+        'https://www.youtube.com/watch?v=' + video.videoId,
+    ].join(('\n')),
+    parse_mode: 'HTML',
+    media: video.thumbnail,
+    type: 'photo',
+}));
 
 export class BotApp {
     private bot: Telegraf;
@@ -70,11 +87,7 @@ export class BotApp {
             const { telegram } = ctx;
 
             const randomVideos = await asyncFilter(getRandomItemsFromArray(videos, 10), this.validateVideo);
-            const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = randomVideos.map((video) => ({
-                caption: video.title + '\n\n' + video.watchUrl,
-                media: video.thumbnail,
-                type: 'photo',
-            }));
+            const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, randomVideos);
 
             ctx.session.videos = videos;
 
@@ -158,11 +171,7 @@ export class BotApp {
         // @ts-ignore
         const { videos } = action.payload as FetchActionPayload<FetchActionType.FETCH_END>;
         const randomVideos = await asyncFilter(getRandomItemsFromArray(videos, 10), this.validateVideo);
-        const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = randomVideos.map((video) => ({
-            caption: video.title + '\n\n' + video.watchUrl,
-            media: video.thumbnail,
-            type: 'photo',
-        }));
+        const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, randomVideos);
 
         ctx.session.videos = videos;
 

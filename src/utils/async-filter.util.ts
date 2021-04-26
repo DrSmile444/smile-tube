@@ -6,3 +6,10 @@ export const asyncFilter = async <T>(
 
     return arr.filter((_v, index) => results[index]);
 };
+
+export const asyncMap = async <T, D = any>(
+    arr: T[],
+    predicate: (item: T) => Promise<T> | T,
+): Promise<T[]> => {
+    return await Promise.all(arr.map(predicate));
+};

@@ -65,15 +65,12 @@ export class YoutubeFormatterService {
         return {
             title: video.title.runs[0].text,
             duration: video.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.text.simpleText,
-            publishedTimeText,
             publishedTime: video.publishedTimeText ?
                 moment().subtract(+value, units as any).toDate() :
                 new Date(+video.upcomingEventData.startTime * 1000),
-            viewCountText: video.viewCountText.simpleText,
+            viewCountText: video.viewCountText.simpleText.split('views')[0].trim(),
             thumbnail: video.thumbnail.thumbnails[video.thumbnail.thumbnails.length - 1].url,
             videoId: video.videoId,
-            // maybe remove, can bebuild from scratch
-            watchUrl: `https://www.youtube.com${video.navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
         };
     }
 
