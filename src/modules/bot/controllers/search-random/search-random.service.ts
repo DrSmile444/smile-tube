@@ -76,7 +76,7 @@ export class SearchRandomService {
         });
     }
 
-    onFoundChannel(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.FOUND_CHANNEL>) {
+    async onFoundChannel(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.FOUND_CHANNEL>) {
         const { channel } = action.payload;
         const { telegram } = ctx;
         const { chatId } = getCtxInfo(ctx);
@@ -94,14 +94,25 @@ export class SearchRandomService {
             } as tt.ExtraPhoto,
         };
 
-        telegram.sendPhoto(chatId, channelData.thumbnail, channelData.options);
+        await telegram.sendPhoto(chatId, channelData.thumbnail, channelData.options);
+        const someTextMessage = await ctx.reply('...');
+        ctx.state.editMessageId = someTextMessage.message_id;
     }
 
     onVideosFetched(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
         const { channel } = ctx.session;
         const { videos } = action.payload;
+        const { chatId } = getCtxInfo(ctx);
 
-        ctx.reply(ctx.i18n.t('scenes.shared.fetchVideoProgress', { fetchedCount: channel.videoCount, videoCount: videos.length }));
+        ctx.telegram.editMessageText(
+            chatId,
+            ctx.state.editMessageId,
+            ctx.state.editMessageId,
+            ctx.i18n.t(
+            'scenes.shared.fetchVideoProgress',
+            { fetchedCount: videos.length, videoCount: channel.videoCount },
+            ),
+        );
     }
 
     async onFetchEnd(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
@@ -114,7 +125,15 @@ export class SearchRandomService {
 
         ctx.session.videos = videos;
 
-        ctx.reply(ctx.i18n.t('scenes.shared.fetchedAllVideos', { videoCount: videos.length }))
+        telegram.editMessageText(
+            chatId,
+            ctx.state.editMessageId,
+            ctx.state.editMessageId,
+            ctx.i18n.t(
+                'scenes.shared.fetchedAllVideos',
+                { videoCount: videos.length },
+            ),
+        )
             .then(delayMessage(2000))
             .then(() => telegram.sendDice(chatId))
             .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
