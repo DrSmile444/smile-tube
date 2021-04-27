@@ -107,7 +107,7 @@ export function addFetchedChannel(ctx: ContextMessageUpdate, channel: Channel) {
     }
 
     const newSearchedChannels = ctx.session.searchedChannels
-        .filter((searchedChannel) => searchedChannel.channelId !== channel.channelId)
+        .filter((searchedChannel) => searchedChannel.channelId !== channel.channelId);
 
     newSearchedChannels.unshift(channel);
 

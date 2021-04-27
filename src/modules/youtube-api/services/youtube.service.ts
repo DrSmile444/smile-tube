@@ -10,9 +10,9 @@ import { YoutubeApiService } from './youtube-api.service';
 
 @injectable()
 export class YoutubeService {
-    @inject(YoutubeTypes.YoutubeApiService) private youtubeApiService: YoutubeApiService;
+    readonly DEFAULT_VIDEOS_COUNT = 500;
 
-    private readonly DEFAULT_VIDEOS_COUNT = 500;
+    @inject(YoutubeTypes.YoutubeApiService) private youtubeApiService: YoutubeApiService;
 
     updateChannelVideosList(channelName: string) {
         const stream$: BehaviorSubject<FetchAction> = new BehaviorSubject<FetchAction>(null);

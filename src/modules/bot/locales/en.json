@@ -5,7 +5,7 @@
   "scenes.searchRandom.searchedChannelsList": "Last searched channels:",
   "scenes.searchRandom.searchChannel": "\uD83D\uDD0D Searching for a passed channel\n\n*${message}*",
   "scenes.shared.foundChannel": "🔍 Found the channel!\n*${title}* with *${videoCount}* videos.",
-  "scenes.shared.fetchVideoProgress": "Fetched ${fetchedCount} of ${videoCount} videos...",
+  "scenes.shared.fetchVideoProgress": "Fetched ${fetchedCount} of ${videoCount} videos...\n${progressBar}",
   "scenes.shared.fetchedAllVideos": "Done! Fetched last ${videoCount} videos.\nFinding random videos...",
   "scenes.shared.fetchMoreTitle": "You can fetch 10 more videos. Press the more button below",
   "scenes.shared.fetchMoreButton": "🔍 More 10 videos",

@@ -6,7 +6,7 @@ import { BaseScene } from 'telegraf/typings/scenes';
 
 import { asyncMap } from '../../../../utils';
 import { FetchAction, FetchActionPayload, FetchActionType, youtubeService } from '../../../youtube-api';
-import { getRandomItemsFromArray } from '../../utils';
+import { getProgressBar, getRandomItemsFromArray } from '../../utils';
 import { addFetchedChannel, delayMessage, getCtxInfo, getMediaGroup, moreButton, validateVideo } from './search-random.helper';
 
 
@@ -95,7 +95,14 @@ export class SearchRandomService {
         };
 
         await telegram.sendPhoto(chatId, channelData.thumbnail, channelData.options);
-        const someTextMessage = await ctx.reply('...');
+        const someTextMessage = await ctx.reply(ctx.i18n.t(
+            'scenes.shared.fetchVideoProgress',
+            {
+                fetchedCount: 0,
+                videoCount: channel.videoCount,
+                progressBar: getProgressBar(0, Math.min(channel.videoCount, youtubeService.DEFAULT_VIDEOS_COUNT)) + '.',
+            },
+        ));
         ctx.state.editMessageId = someTextMessage.message_id;
     }
 
@@ -104,13 +111,15 @@ export class SearchRandomService {
         const { videos } = action.payload;
         const { chatId } = getCtxInfo(ctx);
 
+        const progressBar = getProgressBar(videos.length, Math.min(channel.videoCount, youtubeService.DEFAULT_VIDEOS_COUNT));
+
         ctx.telegram.editMessageText(
             chatId,
             ctx.state.editMessageId,
             ctx.state.editMessageId,
             ctx.i18n.t(
             'scenes.shared.fetchVideoProgress',
-            { fetchedCount: videos.length, videoCount: channel.videoCount },
+            { fetchedCount: videos.length, videoCount: channel.videoCount, progressBar },
             ),
         );
     }
