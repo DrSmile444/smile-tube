@@ -116,7 +116,7 @@ export class SearchRandomService {
         ctx.telegram.editMessageText(
             chatId,
             ctx.state.editMessageId,
-            ctx.state.editMessageId,
+            null,
             ctx.i18n.t(
             'scenes.shared.fetchVideoProgress',
             { fetchedCount: videos.length, videoCount: channel.videoCount, progressBar },
@@ -137,7 +137,7 @@ export class SearchRandomService {
         telegram.editMessageText(
             chatId,
             ctx.state.editMessageId,
-            ctx.state.editMessageId,
+            null,
             ctx.i18n.t(
                 'scenes.shared.fetchedAllVideos',
                 { videoCount: videos.length },

@@ -16,6 +16,9 @@ export type ContextMessageUpdate = {
         language: Language;
         __language_code: Language;
     };
+    state: {
+        editMessageId?: number;
+    }
     webhookReply: boolean;
     // @ts-ignore
 } & NarrowedContext<Context<any> & { match: RegExpExecArray; }, any>;

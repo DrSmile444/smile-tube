@@ -35,7 +35,8 @@ export class YoutubeApiService {
         const videos = youtubeRows
             .filter(videoRowFilter)
             .map(videoRowFilter)
-            .map(this.youtubeFormatterService.formatPageVideo);
+            .map(this.youtubeFormatterService.formatPageVideo)
+            .filter(Boolean);
 
         const nextContinuation = youtubeRows
             .filter(continuationRowFilter)
@@ -55,7 +56,8 @@ export class YoutubeApiService {
         const videos = youtubeRows
             .filter(videoRowFilter)
             .map(videoRowFilter)
-            .map(this.youtubeFormatterService.formatPageVideo);
+            .map(this.youtubeFormatterService.formatPageVideo)
+            .filter(Boolean);
 
         const nextContinuation = youtubeRows
             .filter(continuationRowFilter)

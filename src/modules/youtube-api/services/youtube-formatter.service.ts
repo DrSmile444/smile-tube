@@ -62,16 +62,20 @@ export class YoutubeFormatterService {
                 .split(' ') :
             [];
 
-        return {
-            title: video.title.runs[0].text,
-            duration: video.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.text.simpleText,
-            publishedTime: video.publishedTimeText ?
-                moment().subtract(+value, units as any).toDate() :
-                new Date(+video.upcomingEventData.startTime * 1000),
-            viewCountText: video.viewCountText.simpleText.split('views')[0].trim(),
-            thumbnail: video.thumbnail.thumbnails[video.thumbnail.thumbnails.length - 1].url,
-            videoId: video.videoId,
-        };
+        try {
+            return {
+                title: video.title.runs[0].text,
+                duration: video.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.text.simpleText,
+                publishedTime: video.publishedTimeText ?
+                    moment().subtract(+value, units as any).toDate() :
+                    new Date(+video.upcomingEventData.startTime * 1000),
+                viewCountText: video.viewCountText.simpleText.split('views')[0].trim(),
+                thumbnail: video.thumbnail.thumbnails[video.thumbnail.thumbnails.length - 1].url,
+                videoId: video.videoId,
+            };
+        } catch (e) {
+            return null;
+        }
     }
 
     formatContinuation(continuation: ChannelVideosResponse.ContinuationItemRenderer) {

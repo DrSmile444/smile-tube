@@ -75,6 +75,7 @@ export class YoutubeService {
             }
         })().then().catch((error) => {
             console.log('!!! Caught error');
+            console.log(error);
             stream$.next({ type: FetchActionType.ERROR, payload: { error } } as FetchAction);
             stream$.complete();
         });
