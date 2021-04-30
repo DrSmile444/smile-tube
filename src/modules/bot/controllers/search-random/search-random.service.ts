@@ -69,6 +69,8 @@ export class SearchRandomService {
             const { telegram } = ctx;
             const sceneType = await this.getSceneType(ctx);
 
+            ctx.session.videoOffset += 10;
+
             const videosGroup: Video[] = await this.getMediaGroup(ctx, videos);
             const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, videosGroup);
 
@@ -142,10 +144,11 @@ export class SearchRandomService {
 
         const { videos } = action.payload;
 
+        ctx.session.videoOffset = 0;
+        ctx.session.videos = videos;
+
         const videosGroup: Video[] = await this.getMediaGroup(ctx, videos);
         const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, videosGroup);
-
-        ctx.session.videos = videos;
 
         await telegram.editMessageText(
             chatId,
@@ -182,7 +185,10 @@ export class SearchRandomService {
                 return await asyncMap(getRandomItemsFromArray(videos, 10), validateVideo);
 
             case SearchType.LATEST:
-                return await asyncMap(videos.slice(0, 10), validateVideo);
+                const from = Math.min(videos.length - 10, ctx.session.videoOffset);
+                const to = Math.min(videos.length, ctx.session.videoOffset + 10);
+
+                return await asyncMap(videos.slice(from, to), validateVideo);
         }
     }
 }

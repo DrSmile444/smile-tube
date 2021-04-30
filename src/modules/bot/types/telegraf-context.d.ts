@@ -26,6 +26,7 @@ export type ContextMessageUpdate = {
         __scenes: SceneSessionData & {
             state: SceneSessionData['state'] & SceneState;
         };
+        videoOffset?: number; // used for latest videos
     };
     state: {
         editMessageId?: number;
