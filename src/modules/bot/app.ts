@@ -43,6 +43,12 @@ export class BotApp {
                 await ctx.scene.enter('search-random', { type: SearchType.RANDOM });
             }),
         );
+        this.bot.hears(
+            match('keyboards.mainKeyboard.searchLatest'),
+            errorHandler(async (ctx: ContextMessageUpdate) => {
+                await ctx.scene.enter('search-random', { type: SearchType.LATEST });
+            }),
+        );
     }
 
     start() {

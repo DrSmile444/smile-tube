@@ -11,12 +11,14 @@ export function delayMessage(time) {
     return () => new Promise((resolve) => setTimeout(resolve, time));
 }
 
-export const moreButton = (ctx: ContextMessageUpdate) => () => ctx.reply(ctx.i18n.t('scenes.shared.fetchMoreTitle'), Markup.inlineKeyboard([
-    {
-        text: ctx.i18n.t('scenes.shared.fetchMoreButton'),
-        callback_data: 'random_more',
-    },
-]));
+export const moreButton = (ctx: ContextMessageUpdate) => () => {
+    return ctx.reply(ctx.i18n.t('scenes.shared.fetchMoreTitle'), Markup.inlineKeyboard([
+        {
+            text: ctx.i18n.t('scenes.shared.fetchMoreButton'),
+            callback_data: 'random_more',
+        },
+    ]));
+}
 
 export function getCtxInfo(ctx: ContextMessageUpdate) {
     const { id, username } = ctx.message && ctx.message.from || ctx.update.callback_query.from;

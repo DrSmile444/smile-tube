@@ -67,17 +67,23 @@ export class SearchRandomService {
 
             const { videos } = ctx.session;
             const { telegram } = ctx;
+            const sceneType = await this.getSceneType(ctx);
 
             const videosGroup: Video[] = await this.getMediaGroup(ctx, videos);
             const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, videosGroup);
 
             ctx.session.videos = videos;
 
-            telegram.sendDice(chatId)
-                .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
-                .then(delayMessage(2000))
-                .then(() => ctx.replyWithMediaGroup(mediaGroup))
-                .then(moreButton(ctx));
+            if (sceneType === SearchType.RANDOM) {
+                await telegram.sendDice(chatId);
+                await telegram.sendChatAction(chatId, 'upload_photo');
+                await delayMessage(2000)();
+            } else {
+                await telegram.sendChatAction(chatId, 'upload_photo');
+            }
+
+            await ctx.replyWithMediaGroup(mediaGroup);
+            await moreButton(ctx)();
         });
     }
 
@@ -132,6 +138,7 @@ export class SearchRandomService {
     async onFetchEnd(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
         const { telegram } = ctx;
         const { chatId } = getCtxInfo(ctx);
+        const sceneType = await this.getSceneType(ctx);
 
         const { videos } = action.payload;
 
@@ -140,7 +147,7 @@ export class SearchRandomService {
 
         ctx.session.videos = videos;
 
-        telegram.editMessageText(
+        await telegram.editMessageText(
             chatId,
             ctx.state.editMessageId,
             null,
@@ -148,13 +155,17 @@ export class SearchRandomService {
                 'scenes.shared.fetchedAllVideos',
                 { videoCount: videos.length },
             ),
-        )
-            .then(delayMessage(2000))
-            .then(() => telegram.sendDice(chatId))
-            .then(() => telegram.sendChatAction(chatId, 'upload_photo'))
-            .then(delayMessage(2000))
-            .then(() => ctx.replyWithMediaGroup(mediaGroup))
-            .then(moreButton(ctx));
+        );
+
+        if (sceneType === SearchType.RANDOM) {
+            await delayMessage(2000)();
+            await telegram.sendDice(chatId);
+        }
+
+        await telegram.sendChatAction(chatId, 'upload_photo');
+        await delayMessage(2000)();
+        await ctx.replyWithMediaGroup(mediaGroup);
+        await moreButton(ctx)();
     }
 
     onError(ctx: ContextMessageUpdate, action: FetchActionPayload<FetchActionType.ERROR>) {
