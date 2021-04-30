@@ -3,11 +3,17 @@ import { SceneSessionData } from 'telegraf/src/scenes/context';
 import { SceneContextScene } from 'telegraf/typings/scenes';
 
 import { Channel, Video } from '../../youtube-api';
-import { I18nOverride, Language } from '../interfaces';
+import { I18nOverride, Language, SearchType } from '../interfaces';
+
+export interface SceneState {
+    type?: SearchType;
+}
 
 export type ContextMessageUpdate = {
     i18n: I18nOverride;
-    scene: SceneContextScene<ContextMessageUpdate>;
+    scene: Omit<SceneContextScene<ContextMessageUpdate>, 'enter'> & {
+        enter(sceneId: string, initialState?: SceneState, silent?: boolean): Promise<unknown>,
+    };
     session: {
         searchedChannels?: Channel[];
         channel?: Channel;
@@ -17,7 +23,9 @@ export type ContextMessageUpdate = {
         };
         language: Language;
         __language_code: Language;
-        __scenes: SceneSessionData;
+        __scenes: SceneSessionData & {
+            state: SceneSessionData['state'] & SceneState;
+        };
     };
     state: {
         editMessageId?: number;

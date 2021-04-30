@@ -5,6 +5,7 @@ import { ContextMessageUpdate } from 'telegraf-context';
 import * as LocalSession from 'telegraf-session-local';
 
 import { searchRandomController, startController } from './controllers';
+import { SearchType } from './interfaces';
 import { getUserInfo } from './middlewares';
 import { errorHandler } from './utils';
 require('dotenv').config();
@@ -38,7 +39,9 @@ export class BotApp {
         this.bot.start(errorHandler(async (ctx: ContextMessageUpdate) => ctx.scene.enter('start')));
         this.bot.hears(
             match('keyboards.mainKeyboard.searchRandom'),
-            errorHandler(async (ctx: ContextMessageUpdate) => await ctx.scene.enter('search-random')),
+            errorHandler(async (ctx: ContextMessageUpdate) => {
+                await ctx.scene.enter('search-random', { type: SearchType.RANDOM });
+            }),
         );
     }
 

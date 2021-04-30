@@ -5,7 +5,8 @@ import * as tt from 'telegraf/src/telegram-types';
 import { BaseScene } from 'telegraf/typings/scenes';
 
 import { asyncMap } from '../../../../utils';
-import { FetchAction, FetchActionPayload, FetchActionType, youtubeService } from '../../../youtube-api';
+import { FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../../../youtube-api';
+import { SearchType } from '../../interfaces';
 import { getProgressBar, getRandomItemsFromArray } from '../../utils';
 import { addFetchedChannel, delayMessage, getCtxInfo, getMediaGroup, moreButton, validateVideo } from './search-random.helper';
 
@@ -15,6 +16,10 @@ export class SearchRandomService {
 
     constructor(scene: BaseScene<Context<any>>) {
         this.scene = scene;
+    }
+
+    getSceneType(ctx: ContextMessageUpdate): SearchType {
+        return ctx.session.__scenes.state.type || SearchType.RANDOM;
     }
 
     onText(ctx: ContextMessageUpdate, message = ctx.message.text) {
@@ -63,8 +68,8 @@ export class SearchRandomService {
             const { videos } = ctx.session;
             const { telegram } = ctx;
 
-            const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), validateVideo);
-            const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, randomVideos);
+            const videosGroup: Video[] = await this.getMediaGroup(ctx, videos);
+            const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, videosGroup);
 
             ctx.session.videos = videos;
 
@@ -129,8 +134,9 @@ export class SearchRandomService {
         const { chatId } = getCtxInfo(ctx);
 
         const { videos } = action.payload;
-        const randomVideos = await asyncMap(getRandomItemsFromArray(videos, 10), validateVideo);
-        const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, randomVideos);
+
+        const videosGroup: Video[] = await this.getMediaGroup(ctx, videos);
+        const mediaGroup: ReadonlyArray<tg.InputMediaPhoto> = getMediaGroup(ctx, videosGroup);
 
         ctx.session.videos = videos;
 
@@ -155,5 +161,17 @@ export class SearchRandomService {
         const { message } = getCtxInfo(ctx);
         const { error } = action;
         ctx.reply(ctx.i18n.t('scenes.errors.notFound', { message })).then(() => ctx.reply(error && error.message || String(error)));
+    }
+
+    private async getMediaGroup(ctx: ContextMessageUpdate, videos: Video[]): Promise<Video[]> {
+        const sceneType = this.getSceneType(ctx);
+
+        switch (sceneType) {
+            case SearchType.RANDOM:
+                return await asyncMap(getRandomItemsFromArray(videos, 10), validateVideo);
+
+            case SearchType.LATEST:
+                return await asyncMap(videos.slice(0, 10), validateVideo);
+        }
     }
 }
