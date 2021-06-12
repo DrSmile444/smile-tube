@@ -15,7 +15,7 @@
   "scenes.errors.notFound": "Cannot find ${message} channel. Please, try another channel",
   "shared.somethingWentWrong": "❌ Something went wrong. Please, try one more time...",
   "shared.whatNext": "✋ What can we do next?",
-  "keyboards.mainKeyboard.searchRandom": "🔍 Search random 10 videos",
+  "keyboards.mainKeyboard.searchRandom": "\uD83C\uDFB2 Search random 10 videos",
   "keyboards.mainKeyboard.searchLatest": "🔍 Search latest 10 videos",
   "keyboards.backKeyboard.back": "◀️ Back"
 }

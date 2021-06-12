@@ -37,8 +37,16 @@ export function getSearchedChannelsButtons(ctx: ContextMessageUpdate, channels: 
     }
 
     const buttons = channels.map((channel) => {
+        const channelName = channel.thumbnailData ?
+            `${channel.title.trim()} ${channel.thumbnailData.colorEmoji[0].emoji}${channel.thumbnailData.colorEmoji[1].emoji}` :
+            channel.title;
+
+        // const channelName = 'test';
+
+        console.log({channelName});
+
         return Markup.button.callback(
-            channel.title,
+            channelName,
             JSON.stringify({ a: 'searchChannel', p: channel.title }),
             false,
         );

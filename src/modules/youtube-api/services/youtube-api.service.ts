@@ -22,7 +22,7 @@ export class YoutubeApiService {
         const youtubeRows = await this.search(channelName);
         const channels = youtubeRows.filter(channelRowFilter).map(channelRowFilter);
 
-        return this.youtubeFormatterService.formatChannel(channels[0]);
+        return await this.youtubeFormatterService.formatChannel(channels[0]);
     }
 
     async fetchChannelVideos(channelId: string) {

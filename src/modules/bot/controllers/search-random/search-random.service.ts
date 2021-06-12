@@ -19,7 +19,7 @@ export class SearchRandomService {
     }
 
     getSceneType(ctx: ContextMessageUpdate): SearchType {
-        return ctx.session.__scenes.state.type || SearchType.RANDOM;
+        return ctx.session.__scenes.state && ctx.session.__scenes.state.type || SearchType.RANDOM;
     }
 
     onText(ctx: ContextMessageUpdate, message = ctx.message.text) {

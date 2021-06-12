@@ -1,3 +1,5 @@
+import { ImageColors } from '../../image-colors/interfaces';
+
 export interface Video {
     title: string;
     duration: string;
@@ -14,5 +16,6 @@ export interface Channel {
     channelId: string;
     url: string;
     thumbnail: string;
+    thumbnailData: ImageColors;
     channelUrl: string;
 }

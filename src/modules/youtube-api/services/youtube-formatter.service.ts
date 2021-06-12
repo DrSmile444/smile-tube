@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
 import * as moment from 'moment';
 
+import { imageColorsService } from '../../image-colors';
 import { ChannelVideosResponse, FetchVideosResponse, SearchResultResponse, Video } from '../interfaces';
 
 
@@ -17,14 +18,16 @@ export class YoutubeFormatterService {
             .contents;
     }
 
-    formatChannel(channel: SearchResultResponse.ChannelRenderer) {
+    async formatChannel(channel: SearchResultResponse.ChannelRenderer) {
+        const thumbnail = 'https:' + channel.thumbnail.thumbnails[channel.thumbnail.thumbnails.length - 1].url;
         return {
             title: channel.title.simpleText,
             description: channel.descriptionSnippet && channel.descriptionSnippet.runs.map((item) => item.text).join(''),
             videoCount: +channel.videoCountText.runs[0].text.replace(/,/g, ''),
             channelId: channel.channelId,
             url: channel.navigationEndpoint.commandMetadata.webCommandMetadata.url,
-            thumbnail: 'https:' + channel.thumbnail.thumbnails[channel.thumbnail.thumbnails.length - 1].url,
+            thumbnail,
+            thumbnailData: await imageColorsService.colorsFromImage(thumbnail),
             // maybe remove, can bebuild from scratch
             channelUrl: `https://www.youtube.com${channel.navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
         };
