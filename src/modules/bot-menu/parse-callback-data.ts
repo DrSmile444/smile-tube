@@ -1,4 +1,5 @@
 import { DefaultCtx } from './interfaces';
+import { KeyboardMenu } from './keyboard-menu';
 
 
 /**
@@ -9,7 +10,7 @@ import { DefaultCtx } from './interfaces';
 export const parseCallbackData = async <T extends DefaultCtx = DefaultCtx>(ctx: T, next: Function) => {
     if (ctx.callbackQuery?.data) {
         try {
-            ctx.state.callbackData = JSON.parse(ctx.callbackQuery.data);
+            ctx.state.callbackData = KeyboardMenu.remapCompactToFull(JSON.parse(ctx.callbackQuery.data));
         } catch (error) {
             ctx.state.callbackDataError = {
                 message: 'Cannot parse passed data: ' + ctx.callbackQuery.data,

@@ -1,15 +1,15 @@
 // @ts-ignore
 import * as deepEqual from 'deep-equal';
-import { Markup, Telegram } from 'telegraf';
+import { Markup } from 'telegraf';
 
 import { getCtxInfo } from '../bot/controllers/search-random/search-random.helper';
-import { DefaultCtx, MenuConfig, MenuOptionPayload, MenuType } from './interfaces';
+import { DefaultCtx, MenuConfig, MenuOption, MenuOptionPayload, MenuOptionShort, MenuType } from './interfaces';
 import { KeyboardButton } from './keyboard-button';
 
 
 export class KeyboardMenu<T extends DefaultCtx = DefaultCtx, D extends any = string> {
     messageId: number;
-    activeButtons: MenuOptionPayload<D>[] = [];
+    private activeButtons: MenuOptionPayload<D>[] = [];
 
     private RADIO_FORMATTING = {
         active: '🔘',
@@ -20,6 +20,40 @@ export class KeyboardMenu<T extends DefaultCtx = DefaultCtx, D extends any = str
         active: '✅',
         disabled: '',
     };
+
+    static remapCompactToFull<V>(options: MenuOptionShort<V>): MenuOption<V> {
+        const newOption = {
+            action: options.a,
+            payload: {
+                default: !!options.p.d,
+                group: options.p.g,
+                value: options.p.v,
+            },
+        };
+
+        if (!options.p.d) {
+            delete newOption.payload.default;
+        }
+
+        return newOption;
+    }
+
+    static remapFullToCompact<V>(options: MenuOption<V>): MenuOptionShort<V> {
+        const newOption = {
+            a: options.action,
+            p: {
+                d: Number(!!options.payload.default) as 1 | 0,
+                g: options.payload.group,
+                v: options.payload.value,
+            },
+        };
+
+        if (!options.payload.default) {
+            delete newOption.p.d;
+        }
+
+        return newOption;
+    }
 
     constructor(
         private menuConfig: MenuConfig<D>,
@@ -34,7 +68,7 @@ export class KeyboardMenu<T extends DefaultCtx = DefaultCtx, D extends any = str
 
         switch (this.menuConfig.type) {
             case MenuType.RADIO:
-                this.activeButtons = this.activeButtons.filter((button) => button.g !== activeButtons.g);
+                this.activeButtons = this.activeButtons.filter((button) => button.group !== activeButtons.group);
                 this.activeButtons.push(activeButtons);
                 break;
 
@@ -71,8 +105,12 @@ export class KeyboardMenu<T extends DefaultCtx = DefaultCtx, D extends any = str
     getKeyboard() {
         const buttons = this.menuConfig.filters.map((row) => {
             return row.map((button) => {
-                const callbackData = JSON.stringify({ a: this.menuConfig.action, p: button.value });
-                return Markup.button.callback(this.formatButtonLabel(button), callbackData);
+                const shortButton = KeyboardMenu.remapFullToCompact({
+                    action: this.menuConfig.action,
+                    payload: button.value,
+                });
+
+                return Markup.button.callback(this.formatButtonLabel(button), JSON.stringify(shortButton));
             });
         });
 
@@ -81,8 +119,8 @@ export class KeyboardMenu<T extends DefaultCtx = DefaultCtx, D extends any = str
 
     private formatButtonLabel(button: KeyboardButton<MenuOptionPayload<D>>) {
         const isDefaultActiveButton = this.activeButtons
-            .filter((activeButton) => activeButton.g === button.value.g)
-            .length === 0 && !!button.value.d;
+            .filter((activeButton) => activeButton.group === button.value.group)
+            .length === 0 && !!button.value.default;
 
         const isActiveButton = this.activeButtons.some((activeButton) => {
             return deepEqual(activeButton, button.value);

@@ -73,7 +73,7 @@ searchRandomController.action(/videoFilters/, async (ctx: MenuContextUpdate<Cont
         await videoFilterKeyboardCreater(ctx);
     }
 
-    ctx.scene.state.keyboardMenu.toggleActiveButton(ctx, ctx.state.callbackData.p);
+    ctx.scene.state.keyboardMenu.toggleActiveButton(ctx, ctx.state.callbackData.payload);
 });
 
 searchRandomController.on('text', (ctx: ContextMessageUpdate) => searchRandomService.onText(ctx));

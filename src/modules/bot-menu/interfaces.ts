@@ -7,11 +7,6 @@ export enum MenuType {
     CHECKBOX = 'checkbox',
 }
 
-export interface Filter<T = string> {
-    label: string;
-    value: T;
-}
-
 export interface MenuConfig<T extends any = string> {
     action: string;
     type: MenuType;
@@ -20,20 +15,30 @@ export interface MenuConfig<T extends any = string> {
 }
 
 /**
- * action   - Menu action name
- * payload  - Menu action payload
+ * Full types
  * */
+
 export interface MenuOption<T = string> {
-    a: string;
-    p: MenuOptionPayload<T>;
+    action: string;
+    payload: MenuOptionPayload<T>;
+}
+
+export interface MenuOptionPayload<T extends any = string> {
+    group: T;
+    value: string;
+    default?: boolean;
 }
 
 /**
- *  group   - Button group
- *  value   - Button payload
- *  {boolean} default - Is Default selected Button
+ * Short types for callback data
  * */
-export interface MenuOptionPayload<T extends any = string> {
+
+export interface MenuOptionShort<T = string> {
+    a: string;
+    p: MenuOptionPayloadShort<T>;
+}
+
+export interface MenuOptionPayloadShort<T extends any = string> {
     g: T;
     v: string;
     d?: 1 | 0;

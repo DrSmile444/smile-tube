@@ -4,15 +4,15 @@ import { VideoFilterType } from '../interfaces';
 
 export const VIDEO_FILTERS: KeyboardButton<MenuOptionPayload<VideoFilterType>>[][] = [
     [
-        new KeyboardButton('2 Year', { g: VideoFilterType.FROM, v: '2 year' }),
-        new KeyboardButton('1 Year', { g: VideoFilterType.FROM, v: '1 year' }),
-        new KeyboardButton('3 Month', { g: VideoFilterType.FROM, v: '3 month' }),
-        new KeyboardButton('Start', { g: VideoFilterType.FROM, v: 'start', d: 1 }),
+        new KeyboardButton('2 Year', { group: VideoFilterType.FROM, value: '2 year' }),
+        new KeyboardButton('1 Year', { group: VideoFilterType.FROM, value: '1 year' }),
+        new KeyboardButton('3 Month', { group: VideoFilterType.FROM, value: '3 month' }),
+        new KeyboardButton('Start', { group: VideoFilterType.FROM, value: 'start', default: true }),
     ],
     [
-        new KeyboardButton('2 Year', { g: VideoFilterType.TO, v: '2 year' }),
-        new KeyboardButton('1 Year', { g: VideoFilterType.TO, v: '1 year' }),
-        new KeyboardButton('3 Month', { g: VideoFilterType.TO, v: '3 month' }),
-        new KeyboardButton('Now', { g: VideoFilterType.TO, v: 'Now', d: 1 }),
+        new KeyboardButton('2 Year', { group: VideoFilterType.TO, value: '2 year' }),
+        new KeyboardButton('1 Year', { group: VideoFilterType.TO, value: '1 year' }),
+        new KeyboardButton('3 Month', { group: VideoFilterType.TO, value: '3 month' }),
+        new KeyboardButton('Now', { group: VideoFilterType.TO, value: 'Now', default: true }),
     ],
 ];
