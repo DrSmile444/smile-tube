@@ -18,11 +18,11 @@ export const moreButton = (ctx: ContextMessageUpdate) => () => {
             callback_data: 'random_more',
         },
     ]));
-}
+};
 
 export function getCtxInfo(ctx: ContextMessageUpdate) {
-    const { id, username } = ctx.message && ctx.message.from || ctx.update.callback_query.from;
-    const message = ctx.message && ctx.message.text || JSON.parse(ctx.update.callback_query.data).p;
+    const { id, username } = ctx.message?.from || ctx.update.callback_query.from;
+    const message = ctx.message?.text || JSON.parse(ctx.update.callback_query.data).p;
 
     return {
         chatId: id,

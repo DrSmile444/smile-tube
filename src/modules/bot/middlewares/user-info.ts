@@ -28,5 +28,12 @@ export const getUserInfo = async (ctx: ContextMessageUpdate, next: Function) => 
 
     moment.locale(ctx.session.__language_code);
 
+    if (!ctx.session.videoFilters) {
+        ctx.session.videoFilters = {
+            from: null,
+            to: null,
+        };
+    }
+
     return next();
 };

@@ -182,6 +182,16 @@ export class SearchRandomService {
 
         switch (sceneType) {
             case SearchType.RANDOM:
+                let filteredVideos = videos;
+
+                if (ctx.session.videoFilters.from) {
+                    filteredVideos = filteredVideos.filter((video) => +new Date(video.publishedTime) > from);
+                }
+
+                if (ctx.session.videoFilters.to) {
+                    filteredVideos = filteredVideos.filter((video) => +new Date(video.publishedTime) < to);
+                }
+
                 return await asyncMap(getRandomItemsFromArray(videos, 10), validateVideo);
 
             case SearchType.LATEST:

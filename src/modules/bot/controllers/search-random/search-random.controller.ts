@@ -2,11 +2,15 @@ import { match } from '@edjopato/telegraf-i18n';
 import { Scenes } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
 
-const { BaseScene, Stage } = Scenes;
-
+import { KeyboardMenu, MenuType, parseCallbackData } from '../../../bot-menu';
+import { MenuContextUpdate } from '../../../bot-menu/interfaces';
+import { VIDEO_FILTERS } from '../../const/video-filters.const';
+import { VideoFilterType } from '../../interfaces';
 import { getBackKeyboard, getMainKeyboard } from '../../utils/keyboard.util';
 import { getSearchedChannelsButtons } from './search-random.helper';
 import { SearchRandomService } from './search-random.service';
+
+const { BaseScene, Stage } = Scenes;
 
 export const searchRandomController = new BaseScene('search-random');
 
@@ -40,6 +44,36 @@ const searchRandomService = new SearchRandomService(searchRandomController);
 searchRandomController.action(/searchChannel/, (ctx: ContextMessageUpdate) => {
     const channelData = JSON.parse(ctx.callbackQuery.data);
     searchRandomService.onText(ctx, channelData.p);
+});
+
+const videoFilterKeyboardCreater = async (ctx: ContextMessageUpdate) => {
+    const filtersMenu = new KeyboardMenu<ContextMessageUpdate>({
+        action: 'videoFilters',
+        message: 'Test keyboard',
+        type: MenuType.RADIO,
+        filters: VIDEO_FILTERS,
+    });
+
+    const sentMessage = await ctx.reply(ctx.i18n.t('scenes.searchRandom.searchedChannelsList'), filtersMenu.getKeyboard());
+    filtersMenu.setMessageId(sentMessage.message_id);
+    ctx.scene.state.keyboardMenu = filtersMenu;
+};
+
+searchRandomController.command('test', videoFilterKeyboardCreater);
+
+searchRandomController.use(parseCallbackData);
+searchRandomController.action(/videoFilters/, async (ctx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>) => {
+    const keyboardMenu = ctx.scene.state.keyboardMenu;
+
+    /**
+     * If clicked on old inactive keyboard
+     * */
+    if (!keyboardMenu || !keyboardMenu.toggleActiveButton) {
+        ctx.deleteMessage(ctx.callbackQuery.message.message_id);
+        await videoFilterKeyboardCreater(ctx);
+    }
+
+    ctx.scene.state.keyboardMenu.toggleActiveButton(ctx, ctx.state.callbackData.p);
 });
 
 searchRandomController.on('text', (ctx: ContextMessageUpdate) => searchRandomService.onText(ctx));

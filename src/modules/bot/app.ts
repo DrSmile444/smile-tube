@@ -31,7 +31,7 @@ export class BotApp {
             searchRandomController,
         ] as any);
 
-        this.bot.use(Telegraf.log());
+        // this.bot.use(Telegraf.log());
         this.bot.use(session.middleware());
         this.bot.use(i18n.middleware());
         this.bot.use(stage.middleware());
