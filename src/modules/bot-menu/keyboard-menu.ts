@@ -120,7 +120,7 @@ export class KeyboardMenu<T extends DefaultCtx = DefaultCtx, D extends any = str
     private formatButtonLabel(button: KeyboardButton<MenuOptionPayload<D>>) {
         const isDefaultActiveButton = this.activeButtons
             .filter((activeButton) => activeButton.group === button.value.group)
-            .length === 0 && !!button.value.default;
+            .length === 0 && !!button.value.default && this.menuConfig.type !== MenuType.CHECKBOX;
 
         const isActiveButton = this.activeButtons.some((activeButton) => {
             return deepEqual(activeButton, button.value);
