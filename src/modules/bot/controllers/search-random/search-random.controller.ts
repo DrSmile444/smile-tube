@@ -2,10 +2,11 @@ import { match } from '@edjopato/telegraf-i18n';
 import { Scenes } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
 
+import { reduceArray } from '../../../../utils';
 import { KeyboardMenu, MenuType, parseCallbackData } from '../../../bot-menu';
 import { MenuContextUpdate } from '../../../bot-menu/interfaces';
 import { VIDEO_FILTERS } from '../../const/video-filters.const';
-import { VideoFilterType } from '../../interfaces';
+import { VideoFilters, VideoFilterType } from '../../interfaces';
 import { getBackKeyboard, getMainKeyboard } from '../../utils/keyboard.util';
 import { getSearchedChannelsButtons } from './search-random.helper';
 import { SearchRandomService } from './search-random.service';
@@ -47,12 +48,39 @@ searchRandomController.action(/searchChannel/, (ctx: ContextMessageUpdate) => {
 });
 
 const videoFilterKeyboardCreater = async (ctx: ContextMessageUpdate) => {
-    const filtersMenu = new KeyboardMenu<ContextMessageUpdate>({
-        action: 'videoFilters',
-        message: 'Test keyboard',
-        type: MenuType.RADIO,
-        filters: VIDEO_FILTERS,
-    });
+    const filtersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters>(
+        {
+            action: 'videoFilters',
+            message: 'Test keyboard',
+            type: MenuType.RADIO,
+            filters: VIDEO_FILTERS,
+            state: ctx.session.videoFilters,
+        },
+        {
+            stateToMenu: (state, filters) => {
+                return filters
+                    .reduce(reduceArray)
+                    .filter((button) => {
+                        const isFromButton = button.value.group === VideoFilterType.FROM &&
+                            button.value.value === state.from;
+
+                        const isToButton = button.value.group === VideoFilterType.TO &&
+                            button.value.value === state.to;
+
+                        return isFromButton || isToButton;
+                    });
+            },
+            menuToState: (menu) => {
+                const from = menu.find((button) => button.group === VideoFilterType.FROM)?.value;
+                const to = menu.find((button) => button.group === VideoFilterType.TO)?.value;
+
+                return {
+                    from,
+                    to,
+                };
+            },
+        },
+    );
 
     const sentMessage = await ctx.reply(ctx.i18n.t('scenes.searchRandom.searchedChannelsList'), filtersMenu.getKeyboard());
     filtersMenu.setMessageId(sentMessage.message_id);
@@ -63,7 +91,7 @@ searchRandomController.command('test', videoFilterKeyboardCreater);
 
 searchRandomController.use(parseCallbackData);
 searchRandomController.action(/videoFilters/, async (ctx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>) => {
-    const keyboardMenu = ctx.scene.state.keyboardMenu;
+    const keyboardMenu: KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters> = ctx.scene.state.keyboardMenu;
 
     /**
      * If clicked on old inactive keyboard
@@ -74,6 +102,8 @@ searchRandomController.action(/videoFilters/, async (ctx: MenuContextUpdate<Cont
     }
 
     ctx.scene.state.keyboardMenu.toggleActiveButton(ctx, ctx.state.callbackData.payload);
+    ctx.reply(JSON.stringify(keyboardMenu.state));
+    ctx.session.videoFilters = keyboardMenu.state;
 });
 
 searchRandomController.on('text', (ctx: ContextMessageUpdate) => searchRandomService.onText(ctx));

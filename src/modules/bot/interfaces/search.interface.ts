@@ -4,8 +4,8 @@ export enum SearchType {
 }
 
 export interface VideoFilters {
-    from: number;
-    to: number;
+    from: string;
+    to: string;
 }
 
 export enum VideoFilterType {
