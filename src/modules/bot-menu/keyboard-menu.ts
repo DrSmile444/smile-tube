@@ -150,7 +150,11 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         const { chatId } = getCtxInfo(ctx as any);
 
         if (this.messageId) {
-            ctx.telegram.editMessageText(chatId, this.messageId, null, this.config.message, this.getKeyboard());
+                ctx.telegram
+                    .editMessageText(chatId, this.messageId, null, this.config.message, this.getKeyboard())
+                    .catch((e) => {
+                        console.log(e);
+                    });
         }
     }
 
