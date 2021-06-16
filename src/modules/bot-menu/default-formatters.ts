@@ -6,7 +6,7 @@ import { MenuFilters, MenuFormatters, MenuType } from './interfaces';
 import { KeyboardButton } from './keyboard-button';
 
 export const DEFAULT_FORMATTERS: MenuFormatters<any, MenuFilters<any>, any> = {
-    stateToMenu: (state, filters, menuType, groups) => {
+    stateToMenu: (state = {}, filters, menuType, groups) => {
         const groupKeys = Object.values(groups);
         const allButtons = filters.reduce(reduceArray);
 
@@ -16,7 +16,7 @@ export const DEFAULT_FORMATTERS: MenuFormatters<any, MenuFilters<any>, any> = {
             case MenuType.CHECKBOX:
                 groupKeys.forEach((group) => {
                     const checkboxButton = allButtons.filter((button) => {
-                        return button.value.group === group && state[group].some((item) => deepEqual(item, button.value.value));
+                        return button.value.group === group && state[group]?.some((item) => deepEqual(item, button.value.value));
                     });
                     newButtons.push(...checkboxButton);
                 });
@@ -25,7 +25,6 @@ export const DEFAULT_FORMATTERS: MenuFormatters<any, MenuFilters<any>, any> = {
             case MenuType.RADIO:
                 groupKeys.forEach((group) => {
                     const radioButton = allButtons.find((button) => {
-                        console.log(button, group, state[group]);
                         return button.value.group === group && button.value.value === state[group];
                     });
 
