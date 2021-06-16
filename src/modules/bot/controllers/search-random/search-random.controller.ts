@@ -66,6 +66,23 @@ const videoFilterKeyboardCreater = async (ctx: ContextMessageUpdate) => {
 
 searchRandomController.command('test', videoFilterKeyboardCreater);
 
+searchRandomController.command('test_checkbox', async (ctx: ContextMessageUpdate) => {
+    const filtersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, any>(
+        {
+            action: 'videoFilters',
+            message: 'Test keyboard',
+            type: MenuType.CHECKBOX,
+            filters: VIDEO_FILTERS,
+            groups: VideoFilterType,
+            state: {from: ['1 year', '3 month'], to: [null, '2 year']},
+        },
+    );
+
+    const sentMessage = await ctx.reply(ctx.i18n.t('scenes.searchRandom.searchedChannelsList'), filtersMenu.getKeyboard());
+    filtersMenu.setMessageId(sentMessage.message_id);
+    ctx.scene.state.keyboardMenu = filtersMenu;
+});
+
 searchRandomController.use(parseCallbackData);
 searchRandomController.action(/videoFilters/, async (ctx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>) => {
     const keyboardMenu: KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters> = ctx.scene.state.keyboardMenu;
