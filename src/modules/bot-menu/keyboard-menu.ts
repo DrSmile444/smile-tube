@@ -23,15 +23,6 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     activeButtons: MenuOptionPayload<Group>[] = [];
     state: State;
 
-    constructor(
-        private config: MenuConfig<Group, State>,
-        private formatters: MenuFormatters<State, MenuFilters<Group>, Group>,
-    ) {
-        if (config.state) {
-            this.updateState(config.state);
-        }
-    }
-
     private RADIO_FORMATTING = {
         active: '🔘',
         disabled: '',
@@ -43,12 +34,6 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     };
 
     private _state$: BehaviorSubject<State> = new BehaviorSubject<State>(null);
-
-    get state$() {
-        return this._state$
-            .asObservable()
-            .pipe(skip(1));
-    }
 
     static remapCompactToFull<SGroup>(options: MenuOptionShort<SGroup>): MenuOption<SGroup> {
         const newOption = {
@@ -65,6 +50,21 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         }
 
         return newOption;
+    }
+
+    constructor(
+        private config: MenuConfig<Group, State>,
+        private formatters: MenuFormatters<State, MenuFilters<Group>, Group>,
+    ) {
+        if (config.state) {
+            this.updateState(config.state);
+        }
+    }
+
+    get state$() {
+        return this._state$
+            .asObservable()
+            .pipe(skip(1));
     }
 
     static remapFullToCompact<SGroup>(options: MenuOption<SGroup>): MenuOptionShort<SGroup> {
