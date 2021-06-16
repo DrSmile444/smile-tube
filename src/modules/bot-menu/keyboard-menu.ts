@@ -53,21 +53,6 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         return newOption;
     }
 
-    constructor(
-        private config: MenuConfig<Group, State>,
-        private formatters: MenuFormatters<State, MenuFilters<Group>, Group> = DEFAULT_FORMATTERS,
-    ) {
-        if (config.state) {
-            this.updateState(config.state);
-        }
-    }
-
-    get state$() {
-        return this._state$
-            .asObservable()
-            .pipe(skip(1));
-    }
-
     static remapFullToCompact<SGroup>(options: MenuOption<SGroup>): MenuOptionShort<SGroup> {
         const newOption = {
             a: options.action,
@@ -83,6 +68,21 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         }
 
         return newOption;
+    }
+
+    constructor(
+        private config: MenuConfig<Group, State>,
+        private formatters: MenuFormatters<State, MenuFilters<Group>, Group> = DEFAULT_FORMATTERS,
+    ) {
+        if (config.state) {
+            this.updateState(config.state);
+        }
+    }
+
+    get state$() {
+        return this._state$
+            .asObservable()
+            .pipe(skip(1));
     }
 
     setMessageId(id: number) {
