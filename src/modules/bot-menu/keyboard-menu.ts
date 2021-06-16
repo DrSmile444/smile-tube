@@ -21,6 +21,12 @@ import { KeyboardButton } from './keyboard-button';
 
 
 export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any = any, State extends object = any> {
+    get state$() {
+        return this._state$
+            .asObservable()
+            .pipe(skip(1));
+    }
+
     messageId: number;
     activeButtons: MenuOptionPayload<Group>[] = [];
     state: State;
@@ -72,15 +78,6 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         return newOption;
     }
 
-    constructor(
-        private config: MenuConfig<Group, State, Ctx>,
-        private formatters: MenuFormatters<State, MenuFilters<Group>, Group> = DEFAULT_FORMATTERS,
-    ) {
-        if (config.state) {
-            this.updateState(config.state);
-        }
-    }
-
     static onAction<Ctx extends DefaultCtx = DefaultCtx>(
         menuGetter: (ctx: Ctx) => KeyboardMenu,
         initMenu: (ctx: Ctx) => any,
@@ -100,6 +97,15 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         };
     }
 
+    constructor(
+        private config: MenuConfig<Group, State, Ctx>,
+        private formatters: MenuFormatters<State, MenuFilters<Group>, Group> = DEFAULT_FORMATTERS,
+    ) {
+        if (config.state) {
+            this.updateState(config.state);
+        }
+    }
+
     onAction(ctx: MenuContextUpdate<Ctx, Group>) {
         /**
          * If clicked on old inactive keyboard
@@ -114,12 +120,6 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
 
         this.toggleActiveButton(ctx as any, ctx.state.callbackData.payload as any);
         this.config.onChange(ctx, this.state);
-    }
-
-    get state$() {
-        return this._state$
-            .asObservable()
-            .pipe(skip(1));
     }
 
     setMessageId(id: number) {
