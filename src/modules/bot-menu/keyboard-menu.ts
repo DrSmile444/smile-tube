@@ -9,6 +9,7 @@ import { DEFAULT_FORMATTERS } from './default-formatters';
 import {
     DefaultCtx,
     MenuConfig,
+    MenuContextUpdate,
     MenuFilters,
     MenuFormatters,
     MenuOption,
@@ -23,6 +24,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     messageId: number;
     activeButtons: MenuOptionPayload<Group>[] = [];
     state: State;
+    deleted: boolean = false;
 
     private RADIO_FORMATTING = {
         active: '🔘',
@@ -71,12 +73,47 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     }
 
     constructor(
-        private config: MenuConfig<Group, State>,
+        private config: MenuConfig<Group, State, Ctx>,
         private formatters: MenuFormatters<State, MenuFilters<Group>, Group> = DEFAULT_FORMATTERS,
     ) {
         if (config.state) {
             this.updateState(config.state);
         }
+    }
+
+    static onAction<Ctx extends DefaultCtx = DefaultCtx>(
+        menuGetter: (ctx: Ctx) => KeyboardMenu,
+        initMenu: (ctx: Ctx) => any,
+    ) {
+        return (ctx: MenuContextUpdate<Ctx>) => {
+            const oldMenu = menuGetter(ctx);
+            if (oldMenu?.onAction) {
+                oldMenu.onAction(ctx);
+            } else {
+                if (oldMenu && !oldMenu.deleted) {
+                    ctx.deleteMessage(oldMenu.messageId).catch(() => {});
+                    oldMenu.deleted = true;
+                }
+
+                initMenu(ctx);
+            }
+        };
+    }
+
+    onAction(ctx: MenuContextUpdate<Ctx, Group>) {
+        /**
+         * If clicked on old inactive keyboard
+         * */
+        if (!this.messageId) {
+            ctx.deleteMessage(ctx.callbackQuery.message.message_id).catch(() => {});
+            this.sendMenu(ctx as any);
+        } else if (this.messageId !== ctx.callbackQuery?.message?.message_id) {
+            ctx.deleteMessage(ctx.callbackQuery.message.message_id).catch(() => {});
+            return;
+        }
+
+        this.toggleActiveButton(ctx as any, ctx.state.callbackData.payload as any);
+        this.config.onChange(ctx, this.state);
     }
 
     get state$() {
@@ -96,6 +133,9 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
             this.config.type,
             this.config.groups,
         ).map((button) => button.value);
+
+        const { chatId } = getCtxInfo(ctx as any);
+        ctx.telegram.sendChatAction(chatId, 'typing');
 
         switch (this.config.type) {
             case MenuType.RADIO:
@@ -159,6 +199,14 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     }
 
     async sendMenu(ctx: Ctx) {
+        const { chatId } = getCtxInfo(ctx as any);
+        ctx.telegram.sendChatAction(chatId, 'typing');
+
+        const oldMenu = this.config.menuGetter(ctx);
+        if (oldMenu?.messageId && !oldMenu.deleted) {
+            ctx.deleteMessage(oldMenu.messageId);
+        }
+
         const sentMessage = await ctx.reply(this.config.message, this.getKeyboard());
         this.messageId = sentMessage.message_id;
     }

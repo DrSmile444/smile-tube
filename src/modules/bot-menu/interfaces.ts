@@ -1,18 +1,21 @@
 import { Context, NarrowedContext } from 'telegraf';
 
 import { KeyboardButton } from './keyboard-button';
+import { KeyboardMenu } from './keyboard-menu';
 
 export enum MenuType {
     RADIO = 'radio',
     CHECKBOX = 'checkbox',
 }
 
-export interface MenuConfig<Group extends any = string, State extends object = any> {
+export interface MenuConfig<Group extends any = string, State extends object = any, Ctx extends DefaultCtx = DefaultCtx> {
     action: string;
     type: MenuType;
     message: string;
     filters: MenuFilters<Group>;
     groups: object;
+    onChange: (ctx: MenuContextUpdate<Ctx, Group>, state: State) => any;
+    menuGetter?: (ctx: Ctx) => KeyboardMenu;
     state?: State;
 }
 

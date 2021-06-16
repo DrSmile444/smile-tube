@@ -47,8 +47,8 @@ searchRandomController.action(/searchChannel/, (ctx: ContextMessageUpdate) => {
     searchRandomService.onText(ctx, channelData.p);
 });
 
-const videoFilterKeyboardCreater = async (ctx: ContextMessageUpdate) => {
-    const filtersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters>(
+const initVideoFiltersMenu = (ctx: ContextMessageUpdate) => {
+    const videoFiltersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters>(
         {
             action: 'videoFilters',
             message: 'Test keyboard',
@@ -56,49 +56,51 @@ const videoFilterKeyboardCreater = async (ctx: ContextMessageUpdate) => {
             filters: VIDEO_FILTERS,
             groups: VideoFilterType,
             state: ctx.session.videoFilters,
+            menuGetter: (menuCtx: ContextMessageUpdate) => menuCtx.scene.state.keyboardMenu,
+            onChange: (changeCtx, state) => {
+                changeCtx.session.videoFilters = state;
+                changeCtx.reply(JSON.stringify(state));
+            },
         },
     );
 
-    const sentMessage = await ctx.reply(ctx.i18n.t('scenes.searchRandom.searchedChannelsList'), filtersMenu.getKeyboard());
-    filtersMenu.setMessageId(sentMessage.message_id);
-    ctx.scene.state.keyboardMenu = filtersMenu;
+    videoFiltersMenu.sendMenu(ctx);
+    ctx.scene.state.keyboardMenu = videoFiltersMenu;
 };
 
-searchRandomController.command('test', videoFilterKeyboardCreater);
+searchRandomController.use(parseCallbackData);
 
-searchRandomController.command('test_checkbox', async (ctx: ContextMessageUpdate) => {
-    const filtersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, any>(
+searchRandomController.command('test', initVideoFiltersMenu);
+searchRandomController.action(/videoFilters/, KeyboardMenu.onAction(
+    (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
+    initVideoFiltersMenu,
+));
+
+const initVideoFiltersCheckboxMenu = (ctx: ContextMessageUpdate) => {
+    const videoFiltersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, any>(
         {
-            action: 'videoFilters',
+            action: 'videoFiltersCheckbox',
             message: 'Test keyboard',
             type: MenuType.CHECKBOX,
             filters: VIDEO_FILTERS,
             groups: VideoFilterType,
             state: {from: ['1 year', '3 month'], to: [null, '2 year']},
+            menuGetter: (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
+            onChange: (changeCtx, state) => {
+                changeCtx.reply(JSON.stringify(state));
+            },
         },
     );
 
-    const sentMessage = await ctx.reply(ctx.i18n.t('scenes.searchRandom.searchedChannelsList'), filtersMenu.getKeyboard());
-    filtersMenu.setMessageId(sentMessage.message_id);
-    ctx.scene.state.keyboardMenu = filtersMenu;
-});
+    videoFiltersMenu.sendMenu(ctx);
+    ctx.scene.state.keyboardMenu = videoFiltersMenu;
+};
 
-searchRandomController.use(parseCallbackData);
-searchRandomController.action(/videoFilters/, async (ctx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>) => {
-    const keyboardMenu: KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters> = ctx.scene.state.keyboardMenu;
-
-    /**
-     * If clicked on old inactive keyboard
-     * */
-    if (!keyboardMenu || !keyboardMenu.toggleActiveButton) {
-        ctx.deleteMessage(ctx.callbackQuery.message.message_id);
-        await videoFilterKeyboardCreater(ctx);
-    }
-
-    ctx.scene.state.keyboardMenu.toggleActiveButton(ctx, ctx.state.callbackData.payload);
-    ctx.reply(JSON.stringify(keyboardMenu.state));
-    ctx.session.videoFilters = keyboardMenu.state;
-});
+searchRandomController.command('test_checkbox', initVideoFiltersCheckboxMenu);
+searchRandomController.action(/videoFiltersCheckbox/, KeyboardMenu.onAction(
+    (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
+    initVideoFiltersCheckboxMenu,
+));
 
 searchRandomController.on('text', (ctx: ContextMessageUpdate) => searchRandomService.onText(ctx));
 searchRandomService.onNextButtonClick();
