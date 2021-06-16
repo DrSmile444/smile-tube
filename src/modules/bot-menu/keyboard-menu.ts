@@ -5,6 +5,7 @@ import { skip } from 'rxjs/operators';
 import { Markup } from 'telegraf';
 
 import { getCtxInfo } from '../bot/controllers/search-random/search-random.helper';
+import { DEFAULT_FORMATTERS } from './default-formatters';
 import {
     DefaultCtx,
     MenuConfig,
@@ -54,7 +55,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
 
     constructor(
         private config: MenuConfig<Group, State>,
-        private formatters: MenuFormatters<State, MenuFilters<Group>, Group>,
+        private formatters: MenuFormatters<State, MenuFilters<Group>, Group> = DEFAULT_FORMATTERS,
     ) {
         if (config.state) {
             this.updateState(config.state);
@@ -89,7 +90,12 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     }
 
     toggleActiveButton(ctx: Ctx, activeButton: MenuOptionPayload<Group>) {
-        let activeButtons = this.formatters.stateToMenu(this.state, this.config.filters).map((button) => button.value);
+        let activeButtons = this.formatters.stateToMenu(
+            this.state,
+            this.config.filters,
+            this.config.type,
+            this.config.groups,
+        ).map((button) => button.value);
 
         switch (this.config.type) {
             case MenuType.RADIO:
@@ -117,7 +123,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
                 break;
         }
 
-        const newState = this.formatters.menuToState(activeButtons);
+        const newState = this.formatters.menuToState(activeButtons, this.config.type, this.config.groups);
         this.activeButtons = activeButtons;
         this._state$.next(newState);
         this.state = newState;
@@ -126,8 +132,12 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     }
 
     updateState(state: State, ctx?: Ctx) {
-        // const buttons = this.config.filters.map((row) => row.map((button) => button.value));
-        this.activeButtons = this.formatters.stateToMenu(state, this.config.filters).map((button) => button.value);
+        this.activeButtons = this.formatters.stateToMenu(
+            state,
+            this.config.filters,
+            this.config.type,
+            this.config.groups,
+        ).map((button) => button.value);
         this._state$.next(state);
         this.state = state;
 

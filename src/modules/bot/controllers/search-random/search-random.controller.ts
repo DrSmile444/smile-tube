@@ -54,31 +54,8 @@ const videoFilterKeyboardCreater = async (ctx: ContextMessageUpdate) => {
             message: 'Test keyboard',
             type: MenuType.RADIO,
             filters: VIDEO_FILTERS,
+            groups: VideoFilterType,
             state: ctx.session.videoFilters,
-        },
-        {
-            stateToMenu: (state, filters) => {
-                return filters
-                    .reduce(reduceArray)
-                    .filter((button) => {
-                        const isFromButton = button.value.group === VideoFilterType.FROM &&
-                            button.value.value === state.from;
-
-                        const isToButton = button.value.group === VideoFilterType.TO &&
-                            button.value.value === state.to;
-
-                        return isFromButton || isToButton;
-                    });
-            },
-            menuToState: (menu) => {
-                const from = menu.find((button) => button.group === VideoFilterType.FROM)?.value;
-                const to = menu.find((button) => button.group === VideoFilterType.TO)?.value;
-
-                return {
-                    from,
-                    to,
-                };
-            },
         },
     );
 

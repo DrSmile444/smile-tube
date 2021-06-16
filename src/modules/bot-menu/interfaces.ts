@@ -12,14 +12,15 @@ export interface MenuConfig<Group extends any = string, State extends object = a
     type: MenuType;
     message: string;
     filters: MenuFilters<Group>;
+    groups: object;
     state?: State;
 }
 
 export type MenuFilters<Group extends any = string> = KeyboardButton<MenuOptionPayload<Group>>[][];
 
 export interface MenuFormatters<State extends object, Filters extends any[][], Group> {
-    stateToMenu: (state: State, filters: Filters) => Filters[0];
-    menuToState: (menu: MenuOptionPayload<Group>[]) => State;
+    stateToMenu: (state: State, filters: Filters, type: MenuType, groups: object) => Filters[0];
+    menuToState: (menu: MenuOptionPayload<Group>[], type: MenuType, groups: object) => State;
 }
 
 /**
