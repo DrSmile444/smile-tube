@@ -115,7 +115,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
                     }
                 });
 
-                if (buttonIndex) {
+                if (buttonIndex || buttonIndex === 0) {
                     activeButtons.splice(buttonIndex, 1);
                 } else {
                     activeButtons.push(activeButton);
