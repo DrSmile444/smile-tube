@@ -129,14 +129,28 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     }
 
     private onAction(ctx: MenuContextUpdate<Ctx, Group>) {
+        const messageId = ctx.callbackQuery?.message?.message_id;
         /**
          * If clicked on old inactive keyboard
          * */
         if (!this.messageId) {
-            ctx.deleteMessage(ctx.callbackQuery.message.message_id).catch(() => {});
+            ctx.deleteMessage(messageId).catch(() => {});
             this.sendMenu(ctx as any);
-        } else if (this.messageId !== ctx.callbackQuery?.message?.message_id) {
-            ctx.deleteMessage(ctx.callbackQuery.message.message_id).catch(() => {});
+        } else if (this.messageId !== messageId) {
+            ctx.deleteMessage(messageId).catch(() => {});
+            return;
+        }
+
+        const payload = ctx.state.callbackData?.payload;
+        if (payload?.group === '_local' && payload?.value === '_submit') {
+            this.config.onSubmit(ctx, this.state);
+            this.deleted = true;
+
+            if (this.config.onSubmitUpdater) {
+                this.config.onSubmitUpdater(ctx, messageId, this.state);
+            } else {
+                ctx.deleteMessage(messageId).catch(() => {});
+            }
             return;
         }
 
@@ -234,6 +248,17 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
                 return Markup.button.callback(this.formatButtonLabel(button), JSON.stringify(shortButton));
             });
         });
+
+        if (this.config.onSubmit) {
+            const shortButton = KeyboardMenu.remapFullToCompact({
+                action: this.config.action,
+                payload: { group: '_local', value: '_submit' },
+            });
+
+            const callbackButton = Markup.button.callback(this.config.submitMessage || 'Submit', JSON.stringify(shortButton));
+
+            buttons.push([callbackButton]);
+        }
 
         return Markup.inlineKeyboard(buttons);
     }

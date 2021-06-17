@@ -2,7 +2,7 @@ import { match } from '@edjopato/telegraf-i18n';
 import { Scenes } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
 
-import { KeyboardMenu, MenuType, parseCallbackData } from '../../../bot-menu';
+import { KeyboardMenu, MenuContextUpdate, MenuType, parseCallbackData } from '../../../bot-menu';
 import { VIDEO_FILTERS } from '../../const/video-filters.const';
 import { VideoFilters, VideoFilterType } from '../../interfaces';
 import { getBackKeyboard, getMainKeyboard } from '../../utils/keyboard.util';
@@ -86,6 +86,12 @@ const initVideoFiltersCheckboxMenu = (ctx: ContextMessageUpdate) => {
             menuGetter: (menuCtx: ContextMessageUpdate) => menuCtx.scene.state.keyboardMenu,
             onChange: (changeCtx, state) => {
                 changeCtx.reply(JSON.stringify(state));
+            },
+            onSubmit(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>, state: any): any {
+                changeCtx.reply('submit:' + JSON.stringify(state));
+            },
+            onSubmitUpdater(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>): any {
+                changeCtx.editMessageText('Test after submit');
             },
         },
     );

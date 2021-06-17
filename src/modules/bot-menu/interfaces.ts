@@ -13,18 +13,21 @@ export interface MenuConfig<Group extends any = string, State extends object = a
     action: string;
     type: MenuType;
     message: string;
+    submitMessage?: string;
     filters: MenuFilters<Group>;
     groups: object;
-    onChange: (ctx: MenuContextUpdate<Ctx, Group>, state: State) => any;
-    menuGetter?: (ctx: Ctx) => KeyboardMenu;
     state?: State;
+    menuGetter?(ctx: Ctx): KeyboardMenu;
+    onChange(ctx: MenuContextUpdate<Ctx, Group>, state: State): any;
+    onSubmit?(ctx: MenuContextUpdate<Ctx, Group>, state: State): any;
+    onSubmitUpdater?(ctx: MenuContextUpdate<Ctx, Group>, messageId: number, state: State): any;
 }
 
 export type MenuFilters<Group extends any = string> = KeyboardButton<MenuOptionPayload<Group>>[][];
 
 export interface MenuFormatters<State extends object, Filters extends any[][], Group> {
-    stateToMenu: (state: State, filters: Filters, type: MenuType, groups: object) => Filters[0];
-    menuToState: (menu: MenuOptionPayload<Group>[], type: MenuType, groups: object) => State;
+    stateToMenu(state: State, filters: Filters, type: MenuType, groups: object): Filters[0];
+    menuToState(menu: MenuOptionPayload<Group>[], type: MenuType, groups: object): State;
 }
 
 /**
