@@ -273,7 +273,9 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     private getRangeButtonIndexes(currentButton: MenuOptionPayload<Group>) {
         const allButtons = this.config.filters.reduce(reduceArray);
         const firstButton = this.activeButtons[0];
-        const lastButton = this.activeButtons[this.activeButtons.length - 1];
+        const lastButton = this.activeButtons[1];
+
+        const firstDefault = allButtons.findIndex((button) => !!button.value.default);
 
         const activeButtonIndex = allButtons
             .findIndex((button) => button.value.value === currentButton.value);
@@ -289,7 +291,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
             .findIndex((button, index) => {
                 return lastButton
                     ? button.value.value === lastButton.value
-                    : !!button.value.default && firstButtonIndex !== index;
+                    : !!button.value.default && firstDefault !== index;
             });
 
         return {

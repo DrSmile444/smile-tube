@@ -48,7 +48,7 @@ export const DEFAULT_STATE_MAPPERS: MenuFormatters<any, MenuFilters<any>, any> =
         switch (menuType) {
             case MenuType.RANGE:
                 newState.from = menu[0].value;
-                newState.to = menu[menu.length - 1].value;
+                newState.to = menu[1].value;
                 break;
 
             case MenuType.CHECKBOX:
