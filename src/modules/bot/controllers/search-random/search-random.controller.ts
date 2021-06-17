@@ -2,9 +2,7 @@ import { match } from '@edjopato/telegraf-i18n';
 import { Scenes } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
 
-import { reduceArray } from '../../../../utils';
 import { KeyboardMenu, MenuType, parseCallbackData } from '../../../bot-menu';
-import { MenuContextUpdate } from '../../../bot-menu/interfaces';
 import { VIDEO_FILTERS } from '../../const/video-filters.const';
 import { VideoFilters, VideoFilterType } from '../../interfaces';
 import { getBackKeyboard, getMainKeyboard } from '../../utils/keyboard.util';
@@ -81,11 +79,11 @@ const initVideoFiltersCheckboxMenu = (ctx: ContextMessageUpdate) => {
         {
             action: 'videoFiltersCheckbox',
             message: 'Test keyboard',
-            type: MenuType.CHECKBOX,
+            type: MenuType.RANGE,
             filters: VIDEO_FILTERS,
             groups: VideoFilterType,
-            state: {from: ['1 year', '3 month'], to: [null, '2 year']},
-            menuGetter: (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
+            state: { from: [] },
+            menuGetter: (menuCtx: ContextMessageUpdate) => menuCtx.scene.state.keyboardMenu,
             onChange: (changeCtx, state) => {
                 changeCtx.reply(JSON.stringify(state));
             },
@@ -96,7 +94,7 @@ const initVideoFiltersCheckboxMenu = (ctx: ContextMessageUpdate) => {
     ctx.scene.state.keyboardMenu = videoFiltersMenu;
 };
 
-searchRandomController.command('test_checkbox', initVideoFiltersCheckboxMenu);
+searchRandomController.command('test_range', initVideoFiltersCheckboxMenu);
 searchRandomController.action(/videoFiltersCheckbox/, KeyboardMenu.onAction(
     (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
     initVideoFiltersCheckboxMenu,

@@ -3,6 +3,7 @@ import * as deepEqual from 'deep-equal';
 import { BehaviorSubject } from 'rxjs';
 import { skip } from 'rxjs/operators';
 import { Markup } from 'telegraf';
+import { reduceArray } from '../../utils';
 
 import { getCtxInfo } from '../bot/controllers/search-random/search-random.helper';
 import { DEFAULT_FORMATTERS } from './default-formatters';
@@ -39,6 +40,11 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
 
     private CHECKBOX_FORMATTING = {
         active: '✅',
+        disabled: '',
+    };
+
+    private RANGE_FORMATTING = {
+        active: '🔘',
         disabled: '',
     };
 
@@ -143,6 +149,15 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
                 activeButtons.push(activeButton);
                 break;
 
+            case MenuType.RANGE:
+                const { activeButtonIndex, lastButtonIndex, firstButton, lastButton } = this.getRangeButtonIndexes(activeButton);
+
+                activeButtons = activeButtonIndex > lastButtonIndex
+                    ? [firstButton, activeButton]
+                    : [activeButton, lastButton];
+                activeButtons = activeButtons.filter(Boolean);
+                break;
+
             case MenuType.CHECKBOX:
                 let buttonIndex = null;
 
@@ -226,18 +241,58 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         return Markup.inlineKeyboard(buttons);
     }
 
+    private getRangeButtonIndexes(currentButton: MenuOptionPayload<Group>) {
+        const allButtons = this.config.filters.reduce(reduceArray);
+        const firstButton = this.activeButtons[0];
+        const lastButton = this.activeButtons[this.activeButtons.length - 1];
+
+        const activeButtonIndex = allButtons
+            .findIndex((button) => button.value.value === currentButton.value);
+
+        const firstButtonIndex = allButtons
+            .findIndex((button) => {
+                return firstButton
+                    ? button.value.value === firstButton.value
+                    : !!button.value.default;
+            });
+
+        const lastButtonIndex = allButtons
+            .findIndex((button, index) => {
+                return lastButton
+                    ? button.value.value === lastButton.value
+                    : !!button.value.default && firstButtonIndex !== index;
+            });
+
+        return {
+            firstButton: firstButton || allButtons[firstButtonIndex].value,
+            lastButton : lastButton || allButtons[lastButtonIndex].value,
+            activeButtonIndex,
+            firstButtonIndex,
+            lastButtonIndex,
+        };
+    }
+
     private formatButtonLabel(button: KeyboardButton<MenuOptionPayload<Group>>) {
+        console.log('*** ', this.activeButtons, button);
         const isDefaultActiveButton = this.activeButtons
             .filter((activeButton) => activeButton.group === button.value.group)
-            .length === 0 && !!button.value.default && this.config.type !== MenuType.CHECKBOX;
+            .length === 0 && !!button.value.default;
 
         const isActiveButton = this.activeButtons.some((activeButton) => {
             return deepEqual(activeButton, button.value);
-        }) || isDefaultActiveButton;
+        });
 
         switch (this.config.type) {
+            case MenuType.RANGE:
+                const { activeButtonIndex, firstButtonIndex, lastButtonIndex } = this.getRangeButtonIndexes(button.value);
+                const isButtonInRange = activeButtonIndex >= firstButtonIndex && activeButtonIndex <= lastButtonIndex;
+
+                return isActiveButton || isButtonInRange || isDefaultActiveButton ?
+                    this.RADIO_FORMATTING.active + ' ' + button.label :
+                    this.RADIO_FORMATTING.disabled + ' ' + button.label;
+
             case MenuType.RADIO:
-                return isActiveButton ?
+                return isActiveButton || isDefaultActiveButton ?
                     this.RADIO_FORMATTING.active + ' ' + button.label :
                     this.RADIO_FORMATTING.disabled + ' ' + button.label;
 

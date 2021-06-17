@@ -13,6 +13,7 @@ export const DEFAULT_FORMATTERS: MenuFormatters<any, MenuFilters<any>, any> = {
         const newButtons: KeyboardButton<any>[] = [];
 
         switch (menuType) {
+            case MenuType.RANGE:
             case MenuType.CHECKBOX:
                 groupKeys.forEach((group) => {
                     const checkboxButton = allButtons.filter((button) => {
@@ -39,6 +40,7 @@ export const DEFAULT_FORMATTERS: MenuFormatters<any, MenuFilters<any>, any> = {
         const newState: { [key: string]: any | any[] } = {};
 
         switch (menuType) {
+            case MenuType.RANGE:
             case MenuType.CHECKBOX:
                 groupKeys.forEach((group) => {
                    newState[group] = menu

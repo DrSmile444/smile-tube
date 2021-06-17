@@ -6,6 +6,7 @@ import { KeyboardMenu } from './keyboard-menu';
 export enum MenuType {
     RADIO = 'radio',
     CHECKBOX = 'checkbox',
+    RANGE = 'range',
 }
 
 export interface MenuConfig<Group extends any = string, State extends object = any, Ctx extends DefaultCtx = DefaultCtx> {
