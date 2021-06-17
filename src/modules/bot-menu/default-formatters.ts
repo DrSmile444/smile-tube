@@ -5,7 +5,7 @@ import { reduceArray } from '../../utils';
 import { MenuFilters, MenuFormatters, MenuType } from './interfaces';
 import { KeyboardButton } from './keyboard-button';
 
-export const DEFAULT_FORMATTERS: MenuFormatters<any, MenuFilters<any>, any> = {
+export const DEFAULT_STATE_MAPPERS: MenuFormatters<any, MenuFilters<any>, any> = {
     stateToMenu: (state = {}, filters, menuType, groups) => {
         const groupKeys = Object.values(groups);
         const allButtons = filters.reduce(reduceArray);

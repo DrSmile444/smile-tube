@@ -6,7 +6,8 @@ import { Markup } from 'telegraf';
 
 import { reduceArray } from '../../utils';
 import { getCtxInfo } from '../bot/controllers/search-random/search-random.helper';
-import { DEFAULT_FORMATTERS } from './default-formatters';
+import { DEFAULT_STATE_MAPPERS } from './default-formatters';
+import { FORMATTING_EMOJIS } from './formatting-emojis';
 import {
     DefaultCtx,
     MenuConfig,
@@ -29,29 +30,12 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     }
 
     messageId: number;
-    activeButtons: MenuOptionPayload<Group>[] = [];
     state: State;
-    deleted: boolean = false;
 
+    private activeButtons: MenuOptionPayload<Group>[] = [];
+    private deleted: boolean = false;
     private evenRange: boolean = false;
-
-    private RADIO_FORMATTING = {
-        active: '🔘',
-        disabled: '',
-    };
-
-    private CHECKBOX_FORMATTING = {
-        active: '✅',
-        disabled: '',
-    };
-
-    private RANGE_FORMATTING = {
-        current: '⭐',
-        active: '🔘',
-        disabled: '',
-    };
-
-    private _state$: BehaviorSubject<State> = new BehaviorSubject<State>(null);
+    private readonly _state$: BehaviorSubject<State> = new BehaviorSubject<State>(null);
 
     static remapCompactToFull<SGroup>(options: MenuOptionShort<SGroup>): MenuOption<SGroup> {
         const newOption = {
@@ -108,14 +92,43 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
 
     constructor(
         private config: MenuConfig<Group, State, Ctx>,
-        private formatters: MenuFormatters<State, MenuFilters<Group>, Group> = DEFAULT_FORMATTERS,
+        private stateMappers: MenuFormatters<State, MenuFilters<Group>, Group> = DEFAULT_STATE_MAPPERS,
     ) {
         if (config.state) {
             this.updateState(config.state);
         }
     }
 
-    onAction(ctx: MenuContextUpdate<Ctx, Group>) {
+    updateState(state: State, ctx?: Ctx) {
+        this.activeButtons = this.stateMappers.stateToMenu(
+            state,
+            this.config.filters,
+            this.config.type,
+            this.config.groups,
+        ).map((button) => button.value);
+
+        this._state$.next(state);
+        this.state = state;
+
+        if (ctx) {
+            this.redrawMenu(ctx);
+        }
+    }
+
+    async sendMenu(ctx: Ctx) {
+        const { chatId } = getCtxInfo(ctx as any);
+        ctx.telegram.sendChatAction(chatId, 'typing');
+
+        const oldMenu = this.config.menuGetter(ctx);
+        if (oldMenu?.messageId && !oldMenu.deleted) {
+            ctx.deleteMessage(oldMenu.messageId);
+        }
+
+        const sentMessage = await ctx.reply(this.config.message, this.getKeyboard());
+        this.messageId = sentMessage.message_id;
+    }
+
+    private onAction(ctx: MenuContextUpdate<Ctx, Group>) {
         /**
          * If clicked on old inactive keyboard
          * */
@@ -131,12 +144,8 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         this.config.onChange(ctx, this.state);
     }
 
-    setMessageId(id: number) {
-        this.messageId = id;
-    }
-
-    toggleActiveButton(ctx: Ctx, activeButton: MenuOptionPayload<Group>) {
-        let activeButtons = this.formatters.stateToMenu(
+    private toggleActiveButton(ctx: Ctx, activeButton: MenuOptionPayload<Group>) {
+        let activeButtons = this.stateMappers.stateToMenu(
             this.state,
             this.config.filters,
             this.config.type,
@@ -193,7 +202,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
                 break;
         }
 
-        const newState = this.formatters.menuToState(activeButtons, this.config.type, this.config.groups);
+        const newState = this.stateMappers.menuToState(activeButtons, this.config.type, this.config.groups);
         this.activeButtons = activeButtons;
         this._state$.next(newState);
         this.state = newState;
@@ -202,22 +211,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         this.redrawMenu(ctx);
     }
 
-    updateState(state: State, ctx?: Ctx) {
-        this.activeButtons = this.formatters.stateToMenu(
-            state,
-            this.config.filters,
-            this.config.type,
-            this.config.groups,
-        ).map((button) => button.value);
-        this._state$.next(state);
-        this.state = state;
-
-        if (ctx) {
-            this.redrawMenu(ctx);
-        }
-    }
-
-    redrawMenu(ctx: Ctx) {
+    private redrawMenu(ctx: Ctx) {
         const { chatId } = getCtxInfo(ctx as any);
 
         if (this.messageId) {
@@ -229,20 +223,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         }
     }
 
-    async sendMenu(ctx: Ctx) {
-        const { chatId } = getCtxInfo(ctx as any);
-        ctx.telegram.sendChatAction(chatId, 'typing');
-
-        const oldMenu = this.config.menuGetter(ctx);
-        if (oldMenu?.messageId && !oldMenu.deleted) {
-            ctx.deleteMessage(oldMenu.messageId);
-        }
-
-        const sentMessage = await ctx.reply(this.config.message, this.getKeyboard());
-        this.messageId = sentMessage.message_id;
-    }
-
-    getKeyboard() {
+    private getKeyboard() {
         const buttons = this.config.filters.map((row) => {
             return row.map((button) => {
                 const shortButton = KeyboardMenu.remapFullToCompact({
@@ -289,6 +270,8 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     }
 
     private formatButtonLabel(button: KeyboardButton<MenuOptionPayload<Group>>) {
+        const { CHECKBOX_FORMATTING, RADIO_FORMATTING, RANGE_FORMATTING } = FORMATTING_EMOJIS;
+
         const isDefaultActiveButton = this.activeButtons
             .filter((activeButton) => activeButton.group === button.value.group)
             .length === 0 && !!button.value.default;
@@ -305,22 +288,22 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
                     !this.evenRange && activeButtonIndex === firstButtonIndex;
 
                 if (isCurrentButton) {
-                    return this.RANGE_FORMATTING.current + ' ' + button.label;
+                    return RANGE_FORMATTING.current + ' ' + button.label;
                 }
 
                 return isActiveButton || isButtonInRange || isDefaultActiveButton ?
-                    this.RANGE_FORMATTING.active + ' ' + button.label :
-                    this.RANGE_FORMATTING.disabled + ' ' + button.label;
+                    RANGE_FORMATTING.active + ' ' + button.label :
+                    RANGE_FORMATTING.disabled + ' ' + button.label;
 
             case MenuType.RADIO:
                 return isActiveButton || isDefaultActiveButton ?
-                    this.RADIO_FORMATTING.active + ' ' + button.label :
-                    this.RADIO_FORMATTING.disabled + ' ' + button.label;
+                    RADIO_FORMATTING.active + ' ' + button.label :
+                    RADIO_FORMATTING.disabled + ' ' + button.label;
 
             case MenuType.CHECKBOX:
                 return isActiveButton ?
-                    this.CHECKBOX_FORMATTING.active + ' ' + button.label :
-                    this.CHECKBOX_FORMATTING.disabled + ' ' + button.label;
+                    CHECKBOX_FORMATTING.active + ' ' + button.label :
+                    CHECKBOX_FORMATTING.disabled + ' ' + button.label;
         }
     }
 }
