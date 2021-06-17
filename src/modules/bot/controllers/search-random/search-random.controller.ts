@@ -75,19 +75,19 @@ searchRandomController.action(/videoFilters/, KeyboardMenu.onAction(
 ));
 
 const initVideoFiltersCheckboxMenu = (ctx: ContextMessageUpdate) => {
-    const videoFiltersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, any>(
+    const videoFiltersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters>(
         {
             action: 'videoFiltersCheckbox',
             message: 'Test keyboard',
             type: MenuType.RANGE,
             filters: VIDEO_FILTERS,
             groups: VideoFilterType,
-            state: { from: [] },
+            state: ctx.session.videoFilters,
             menuGetter: (menuCtx: ContextMessageUpdate) => menuCtx.scene.state.keyboardMenu,
             onChange: (changeCtx, state) => {
                 changeCtx.reply(JSON.stringify(state));
             },
-            onSubmit(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>, state: any): any {
+            onSubmit(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>, state): any {
                 changeCtx.reply('submit:' + JSON.stringify(state));
             },
             onSubmitUpdater(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>): any {

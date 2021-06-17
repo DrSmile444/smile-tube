@@ -14,6 +14,12 @@ export const DEFAULT_STATE_MAPPERS: MenuFormatters<any, MenuFilters<any>, any> =
 
         switch (menuType) {
             case MenuType.RANGE:
+                const rangeButtons = allButtons.filter((button) => {
+                    return state.from === button.value.value || state.to === button.value.value;
+                });
+                newButtons.push(...rangeButtons);
+                break;
+
             case MenuType.CHECKBOX:
                 groupKeys.forEach((group) => {
                     const checkboxButton = allButtons.filter((button) => {
@@ -41,6 +47,10 @@ export const DEFAULT_STATE_MAPPERS: MenuFormatters<any, MenuFilters<any>, any> =
 
         switch (menuType) {
             case MenuType.RANGE:
+                newState.from = menu[0].value;
+                newState.to = menu[menu.length - 1].value;
+                break;
+
             case MenuType.CHECKBOX:
                 groupKeys.forEach((group) => {
                    newState[group] = menu

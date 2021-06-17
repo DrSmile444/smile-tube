@@ -9,7 +9,7 @@ export enum MenuType {
     RANGE = 'range',
 }
 
-export interface MenuConfig<Group extends any = string, State extends object = any, Ctx extends DefaultCtx = DefaultCtx> {
+export interface MenuConfig<Group extends any = string, State extends object = object, Ctx extends DefaultCtx = DefaultCtx> {
     action: string;
     type: MenuType;
     message: string;
