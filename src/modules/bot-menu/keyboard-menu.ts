@@ -33,6 +33,8 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     state: State;
     deleted: boolean = false;
 
+    private evenRange: boolean = false;
+
     private RADIO_FORMATTING = {
         active: '🔘',
         disabled: '',
@@ -44,6 +46,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     };
 
     private RANGE_FORMATTING = {
+        current: '⭐',
         active: '🔘',
         disabled: '',
     };
@@ -150,9 +153,9 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
                 break;
 
             case MenuType.RANGE:
-                const { activeButtonIndex, lastButtonIndex, firstButton, lastButton } = this.getRangeButtonIndexes(activeButton);
+                const { firstButton, lastButton } = this.getRangeButtonIndexes(activeButton);
 
-                activeButtons = activeButtonIndex > lastButtonIndex
+                activeButtons = this.evenRange
                     ? [firstButton, activeButton]
                     : [activeButton, lastButton];
                 activeButtons = activeButtons.filter(Boolean);
@@ -182,6 +185,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         this.activeButtons = activeButtons;
         this._state$.next(newState);
         this.state = newState;
+        this.evenRange = !this.evenRange;
 
         this.redrawMenu(ctx);
     }
@@ -286,10 +290,16 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
             case MenuType.RANGE:
                 const { activeButtonIndex, firstButtonIndex, lastButtonIndex } = this.getRangeButtonIndexes(button.value);
                 const isButtonInRange = activeButtonIndex >= firstButtonIndex && activeButtonIndex <= lastButtonIndex;
+                const isCurrentButton = this.evenRange && activeButtonIndex === lastButtonIndex ||
+                    !this.evenRange && activeButtonIndex === firstButtonIndex;
+
+                if (isCurrentButton) {
+                    return this.RANGE_FORMATTING.current + ' ' + button.label;
+                }
 
                 return isActiveButton || isButtonInRange || isDefaultActiveButton ?
-                    this.RADIO_FORMATTING.active + ' ' + button.label :
-                    this.RADIO_FORMATTING.disabled + ' ' + button.label;
+                    this.RANGE_FORMATTING.active + ' ' + button.label :
+                    this.RANGE_FORMATTING.disabled + ' ' + button.label;
 
             case MenuType.RADIO:
                 return isActiveButton || isDefaultActiveButton ?
