@@ -83,12 +83,11 @@ const initVideoFiltersCheckboxMenu = (ctx: ContextMessageUpdate) => {
             filters: VIDEO_FILTERS,
             groups: VideoFilterType,
             state: ctx.session.videoFilters,
+            debug: true,
             menuGetter: (menuCtx: ContextMessageUpdate) => menuCtx.scene.state.keyboardMenu,
-            onChange: (changeCtx, state) => {
-                changeCtx.reply(JSON.stringify(state));
-            },
             onSubmit(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>, state): any {
                 changeCtx.reply('submit:' + JSON.stringify(state));
+                changeCtx.session.videoFilters = state;
             },
             onSubmitUpdater(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>): any {
                 changeCtx.editMessageText('Test after submit');

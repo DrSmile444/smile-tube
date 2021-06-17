@@ -124,7 +124,11 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
             ctx.deleteMessage(oldMenu.messageId);
         }
 
-        const sentMessage = await ctx.reply(this.config.message, this.getKeyboard());
+        const message = this.config.debug ?
+            this.config.message + '\n' + JSON.stringify(this.state) :
+            this.config.message;
+
+        const sentMessage = await ctx.reply(message, this.getKeyboard());
         this.messageId = sentMessage.message_id;
     }
 
@@ -155,7 +159,7 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
         }
 
         this.toggleActiveButton(ctx as any, ctx.state.callbackData.payload as any);
-        this.config.onChange(ctx, this.state);
+        this.config.onChange?.(ctx, this.state);
     }
 
     private toggleActiveButton(ctx: Ctx, activeButton: MenuOptionPayload<Group>) {
@@ -227,10 +231,13 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
 
     private redrawMenu(ctx: Ctx) {
         const { chatId } = getCtxInfo(ctx as any);
+        const message = this.config.debug ?
+            this.config.message + '\n' + JSON.stringify(this.state) :
+            this.config.message;
 
         if (this.messageId) {
                 ctx.telegram
-                    .editMessageText(chatId, this.messageId, null, this.config.message, this.getKeyboard())
+                    .editMessageText(chatId, this.messageId, null, message, this.getKeyboard())
                     .catch((e) => {
                         console.log(e);
                     });

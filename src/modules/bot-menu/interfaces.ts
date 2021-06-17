@@ -17,8 +17,9 @@ export interface MenuConfig<Group extends any = string, State extends object = o
     filters: MenuFilters<Group>;
     groups: object;
     state?: State;
+    debug?: boolean;
     menuGetter?(ctx: Ctx): KeyboardMenu;
-    onChange(ctx: MenuContextUpdate<Ctx, Group>, state: State): any;
+    onChange?(ctx: MenuContextUpdate<Ctx, Group>, state: State): any;
     onSubmit?(ctx: MenuContextUpdate<Ctx, Group>, state: State): any;
     onSubmitUpdater?(ctx: MenuContextUpdate<Ctx, Group>, messageId: number, state: State): any;
 }
