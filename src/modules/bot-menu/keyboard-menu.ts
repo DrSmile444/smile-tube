@@ -3,8 +3,8 @@ import * as deepEqual from 'deep-equal';
 import { BehaviorSubject } from 'rxjs';
 import { skip } from 'rxjs/operators';
 import { Markup } from 'telegraf';
-import { reduceArray } from '../../utils';
 
+import { reduceArray } from '../../utils';
 import { getCtxInfo } from '../bot/controllers/search-random/search-random.helper';
 import { DEFAULT_FORMATTERS } from './default-formatters';
 import {
@@ -153,12 +153,24 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
                 break;
 
             case MenuType.RANGE:
-                const { firstButton, lastButton } = this.getRangeButtonIndexes(activeButton);
+                const {
+                    activeButtonIndex,
+                    firstButtonIndex,
+                    lastButtonIndex,
+                    firstButton,
+                    lastButton,
+                } = this.getRangeButtonIndexes(activeButton);
 
                 activeButtons = this.evenRange
                     ? [firstButton, activeButton]
                     : [activeButton, lastButton];
                 activeButtons = activeButtons.filter(Boolean);
+
+                if (this.evenRange && activeButtonIndex < firstButtonIndex || !this.evenRange && activeButtonIndex > lastButtonIndex) {
+                    activeButtons = activeButtons.reverse();
+                    this.evenRange = !this.evenRange;
+                }
+
                 break;
 
             case MenuType.CHECKBOX:
@@ -277,7 +289,6 @@ export class KeyboardMenu<Ctx extends DefaultCtx = DefaultCtx, Group extends any
     }
 
     private formatButtonLabel(button: KeyboardButton<MenuOptionPayload<Group>>) {
-        console.log('*** ', this.activeButtons, button);
         const isDefaultActiveButton = this.activeButtons
             .filter((activeButton) => activeButton.group === button.value.group)
             .length === 0 && !!button.value.default;
