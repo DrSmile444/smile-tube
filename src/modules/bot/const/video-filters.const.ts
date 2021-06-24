@@ -1,13 +1,9 @@
-import { KeyboardButton, MenuOptionPayload } from '../../bot-menu';
-import { VideoFilterType } from '../interfaces';
+import { KeyboardButton, MenuFilters } from 'telegraf-menu';
 
-
-export const VIDEO_FILTERS: KeyboardButton<MenuOptionPayload<VideoFilterType>>[][] = [
-    [
-        new KeyboardButton('Start', { group: VideoFilterType.FROM, value: 'start', default: true }),
-        new KeyboardButton('2 Year', { group: VideoFilterType.FROM, value: '2 year' }),
-        new KeyboardButton('1 Year', { group: VideoFilterType.FROM, value: '1 year' }),
-        new KeyboardButton('3 Month', { group: VideoFilterType.FROM, value: '3 month' }),
-        new KeyboardButton('Now', { group: VideoFilterType.FROM, value: 'now', default: true }),
-    ],
+export const VIDEO_FILTERS: MenuFilters = [
+    new KeyboardButton('Start', 'start', true),
+    new KeyboardButton('2 Year', '2 year'),
+    new KeyboardButton('1 Year', '1 year'),
+    new KeyboardButton('3 Month', '3 month'),
+    new KeyboardButton('Now', 'now', true),
 ];

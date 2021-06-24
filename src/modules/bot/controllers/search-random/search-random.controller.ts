@@ -1,10 +1,10 @@
 import { match } from '@edjopato/telegraf-i18n';
 import { Scenes } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
+import { parseCallbackData, RangeMenu } from 'telegraf-menu';
 
-import { KeyboardMenu, MenuContextUpdate, MenuType, parseCallbackData } from '../../../bot-menu';
 import { VIDEO_FILTERS } from '../../const/video-filters.const';
-import { VideoFilters, VideoFilterType } from '../../interfaces';
+import { VideoFilters } from '../../interfaces';
 import { getBackKeyboard, getMainKeyboard } from '../../utils/keyboard.util';
 import { getSearchedChannelsButtons } from './search-random.helper';
 import { SearchRandomService } from './search-random.service';
@@ -46,18 +46,16 @@ searchRandomController.action(/searchChannel/, (ctx: ContextMessageUpdate) => {
 });
 
 const initVideoFiltersMenu = (ctx: ContextMessageUpdate) => {
-    const videoFiltersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters>(
+    const videoFiltersMenu = new RangeMenu<ContextMessageUpdate, VideoFilters>(
         {
             action: 'videoFilters',
             message: 'Test keyboard',
-            type: MenuType.RADIO,
             filters: VIDEO_FILTERS,
-            groups: VideoFilterType,
             state: ctx.session.videoFilters,
-            menuGetter: (menuCtx: ContextMessageUpdate) => menuCtx.scene.state.keyboardMenu,
+            debug: true,
+            menuGetter: (menuCtx) => menuCtx.scene.state.keyboardMenu,
             onChange: (changeCtx, state) => {
                 changeCtx.session.videoFilters = state;
-                changeCtx.reply(JSON.stringify(state));
             },
         },
     );
@@ -69,40 +67,9 @@ const initVideoFiltersMenu = (ctx: ContextMessageUpdate) => {
 searchRandomController.use(parseCallbackData);
 
 searchRandomController.command('test', initVideoFiltersMenu);
-searchRandomController.action(/videoFilters/, KeyboardMenu.onAction(
+searchRandomController.action(/videoFilters/, RangeMenu.onAction(
     (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
     initVideoFiltersMenu,
-));
-
-const initVideoFiltersCheckboxMenu = (ctx: ContextMessageUpdate) => {
-    const videoFiltersMenu = new KeyboardMenu<ContextMessageUpdate, VideoFilterType, VideoFilters>(
-        {
-            action: 'videoFiltersCheckbox',
-            message: 'Test keyboard',
-            type: MenuType.RANGE,
-            filters: VIDEO_FILTERS,
-            groups: VideoFilterType,
-            state: ctx.session.videoFilters,
-            debug: true,
-            menuGetter: (menuCtx: ContextMessageUpdate) => menuCtx.scene.state.keyboardMenu,
-            onSubmit(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>, state): any {
-                changeCtx.reply('submit:' + JSON.stringify(state));
-                changeCtx.session.videoFilters = state;
-            },
-            onSubmitUpdater(changeCtx: MenuContextUpdate<ContextMessageUpdate, VideoFilterType>): any {
-                changeCtx.editMessageText('Test after submit');
-            },
-        },
-    );
-
-    videoFiltersMenu.sendMenu(ctx);
-    ctx.scene.state.keyboardMenu = videoFiltersMenu;
-};
-
-searchRandomController.command('test_range', initVideoFiltersCheckboxMenu);
-searchRandomController.action(/videoFiltersCheckbox/, KeyboardMenu.onAction(
-    (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
-    initVideoFiltersCheckboxMenu,
 ));
 
 searchRandomController.on('text', (ctx: ContextMessageUpdate) => searchRandomService.onText(ctx));

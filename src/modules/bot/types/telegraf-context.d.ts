@@ -1,21 +1,22 @@
+import { I18nContext } from '@edjopato/telegraf-i18n';
 import { Context, NarrowedContext } from 'telegraf';
+import { GenericMenu } from 'telegraf-menu';
 import { SceneSessionData } from 'telegraf/src/scenes/context';
 import { SceneContextScene } from 'telegraf/typings/scenes';
 
-import { KeyboardMenu } from '../../bot-menu';
 import { Channel, Video } from '../../youtube-api';
-import { I18nOverride, Language, SearchType, VideoFilters } from '../interfaces';
+import { Language, SearchType, VideoFilters } from '../interfaces';
 
 export interface SceneState {
     type?: SearchType;
 }
 
 export type ContextMessageUpdate = {
-    i18n: I18nOverride;
+    i18n: I18nContext;
     scene: Omit<SceneContextScene<ContextMessageUpdate>, 'enter' | 'state'> & {
         state: {
             type: SearchType;
-            keyboardMenu: KeyboardMenu<ContextMessageUpdate>;
+            keyboardMenu: GenericMenu<ContextMessageUpdate>;
         };
         enter(sceneId: string, initialState?: SceneState, silent?: boolean): Promise<unknown>,
     };
@@ -37,7 +38,7 @@ export type ContextMessageUpdate = {
     };
     state: {
         editMessageId?: number;
-        filtersMenu?: KeyboardMenu<ContextMessageUpdate>;
+        filtersMenu?: GenericMenu<ContextMessageUpdate>;
     }
     webhookReply: boolean;
     callbackQuery: {
