@@ -18,11 +18,11 @@ export const moreButton = (ctx: ContextMessageUpdate) => () => {
             callback_data: 'random_more',
         },
     ]));
-}
+};
 
 export function getCtxInfo(ctx: ContextMessageUpdate) {
-    const { id, username } = ctx.message && ctx.message.from || ctx.update.callback_query.from;
-    const message = ctx.message && ctx.message.text || JSON.parse(ctx.update.callback_query.data).p;
+    const { id, username } = ctx.message?.from || ctx.update.callback_query.from;
+    const message = ctx.message?.text || JSON.parse(ctx.update.callback_query.data).p;
 
     return {
         chatId: id,
@@ -33,7 +33,7 @@ export function getCtxInfo(ctx: ContextMessageUpdate) {
 
 export function getSearchedChannelsButtons(ctx: ContextMessageUpdate, channels: Channel[] | undefined) {
     if (!channels || channels.length === 0) {
-        return {};
+        return null;
     }
 
     const buttons = channels.map((channel) => {

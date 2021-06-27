@@ -2,10 +2,12 @@ import { I18n, match } from '@edjopato/telegraf-i18n';
 import * as path from 'path';
 import { Scenes, Telegraf } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
+import { GenericMenu } from 'telegraf-menu';
 import * as LocalSession from 'telegraf-session-local';
 
 import { searchRandomController, startController } from './controllers';
 import { SearchType } from './interfaces';
+import { initVideoFiltersMenu } from './menus';
 import { getUserInfo } from './middlewares';
 import { errorHandler } from './utils';
 require('dotenv').config();
@@ -31,11 +33,19 @@ export class BotApp {
             searchRandomController,
         ] as any);
 
-        this.bot.use(Telegraf.log());
+        // this.bot.use(Telegraf.log());
         this.bot.use(session.middleware());
         this.bot.use(i18n.middleware());
         this.bot.use(stage.middleware());
         this.bot.use(getUserInfo);
+
+        this.bot.use(GenericMenu.middleware());
+        this.bot.command('video_filters', initVideoFiltersMenu);
+        this.bot.action(/videoFilters/, GenericMenu.onAction(
+            (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
+            initVideoFiltersMenu,
+        ));
+
         this.bot.start(errorHandler(async (ctx: ContextMessageUpdate) => ctx.scene.enter('start')));
         this.bot.hears(
             match('keyboards.mainKeyboard.searchRandom'),

@@ -1,12 +1,14 @@
 import { match } from '@edjopato/telegraf-i18n';
 import { Scenes } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
+import { GenericMenu } from 'telegraf-menu';
 
-const { BaseScene, Stage } = Scenes;
-
+import { initVideoFiltersMenu } from '../../menus';
 import { getBackKeyboard, getMainKeyboard } from '../../utils/keyboard.util';
 import { getSearchedChannelsButtons } from './search-random.helper';
 import { SearchRandomService } from './search-random.service';
+
+const { BaseScene, Stage } = Scenes;
 
 export const searchRandomController = new BaseScene('search-random');
 
@@ -41,6 +43,13 @@ searchRandomController.action(/searchChannel/, (ctx: ContextMessageUpdate) => {
     const channelData = JSON.parse(ctx.callbackQuery.data);
     searchRandomService.onText(ctx, channelData.p);
 });
+
+searchRandomController.use(GenericMenu.middleware());
+searchRandomController.command('video_filters', initVideoFiltersMenu);
+searchRandomController.action(/videoFilters/, GenericMenu.onAction(
+    (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
+    initVideoFiltersMenu,
+));
 
 searchRandomController.on('text', (ctx: ContextMessageUpdate) => searchRandomService.onText(ctx));
 searchRandomService.onNextButtonClick();
