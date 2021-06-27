@@ -1,11 +1,13 @@
+import { VideoFilter } from '../const/video-filters.const';
+
 export enum SearchType {
     RANDOM = 'random',
     LATEST = 'latest',
 }
 
 export interface VideoFilters {
-    from: string;
-    to: string;
+    from: VideoFilter;
+    to: VideoFilter;
 }
 
 export enum VideoFilterType {

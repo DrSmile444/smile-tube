@@ -17,5 +17,13 @@
   "shared.whatNext": "✋ Чем могу помочь дальше?",
   "keyboards.mainKeyboard.searchRandom": "🔍 Найти 10 рандомных видео",
   "keyboards.mainKeyboard.searchLatest": "🔍 Search latest 10 videos",
-  "keyboards.backKeyboard.back": "◀️ Назад"
+  "keyboards.backKeyboard.back": "◀️ Назад",
+  "menu.videoFilters.filter.start": "Начало",
+  "menu.videoFilters.filter.fiveYears": "5 Лет",
+  "menu.videoFilters.filter.twoYears": "2 Года",
+  "menu.videoFilters.filter.oneYear": "1 Год",
+  "menu.videoFilters.filter.threeMonths": "3 Месяца",
+  "menu.videoFilters.filter.now": "Сейчас",
+  "menu.videoFilters.start": "Вы можете отфильтровать диапазон рандомных видео.\n\nВыберите диапазон дат, по которым хотите искать их:",
+  "menu.videoFilters.submit": "Сохранить диапазон"
 }

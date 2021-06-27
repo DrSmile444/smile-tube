@@ -17,5 +17,13 @@
   "shared.whatNext": "✋ What can we do next?",
   "keyboards.mainKeyboard.searchRandom": "🔍 Search random 10 videos",
   "keyboards.mainKeyboard.searchLatest": "🔍 Search latest 10 videos",
-  "keyboards.backKeyboard.back": "◀️ Back"
+  "keyboards.backKeyboard.back": "◀️ Back",
+  "menu.videoFilters.filter.start": "Start",
+  "menu.videoFilters.filter.fiveYears": "5 Years",
+  "menu.videoFilters.filter.twoYears": "2 Years",
+  "menu.videoFilters.filter.oneYear": "1 Year",
+  "menu.videoFilters.filter.threeMonths": "3 Months",
+  "menu.videoFilters.filter.now": "Now",
+  "menu.videoFilters.start": "You can filter the range of random videos.\n\nSelect the date range by which you want to search for them:",
+  "menu.videoFilters.submit": "Save range"
 }

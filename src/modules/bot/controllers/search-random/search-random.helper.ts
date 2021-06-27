@@ -33,7 +33,7 @@ export function getCtxInfo(ctx: ContextMessageUpdate) {
 
 export function getSearchedChannelsButtons(ctx: ContextMessageUpdate, channels: Channel[] | undefined) {
     if (!channels || channels.length === 0) {
-        return {};
+        return null;
     }
 
     const buttons = channels.map((channel) => {

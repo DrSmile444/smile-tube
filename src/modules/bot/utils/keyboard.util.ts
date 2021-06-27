@@ -35,16 +35,3 @@ export function getMainKeyboard(ctx: ContextMessageUpdate) {
         mainKeyboardSearchLatest,
     };
 }
-
-/**
- * Returns keyboard for video filters
- * @param {ContextMessageUpdate} ctx - telegram context
- * */
-export function getVideoFiltersKeyboard(ctx: ContextMessageUpdate) {
-    return Markup.inlineKeyboard(
-        [
-            [Markup.button.callback('Custom From', JSON.stringify({ a: 'videoFilters', p: { t: 'from', p: 'custom' } }), false)],
-            [Markup.button.callback('Custom To', JSON.stringify({ a: 'videoFilters', p: { t: 'to', p: 'custom' } }), false)],
-        ],
-    );
-}

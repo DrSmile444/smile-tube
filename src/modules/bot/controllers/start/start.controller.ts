@@ -1,9 +1,9 @@
 import { Scenes } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
 
-const { BaseScene, Stage } = Scenes;
-
 import { getMainKeyboard } from '../../utils/keyboard.util';
+
+const { BaseScene, Stage } = Scenes;
 
 export const startController = new BaseScene('start');
 

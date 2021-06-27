@@ -6,6 +6,7 @@ import { BaseScene } from 'telegraf/typings/scenes';
 
 import { asyncMap } from '../../../../utils';
 import { FetchAction, FetchActionPayload, FetchActionType, Video, youtubeService } from '../../../youtube-api';
+import { VIDEO_FILTERS_VALUES } from '../../const/video-filters.const';
 import { SearchType } from '../../interfaces';
 import { getProgressBar, getRandomItemsFromArray } from '../../utils';
 import { addFetchedChannel, delayMessage, getCtxInfo, getMediaGroup, moreButton, validateVideo } from './search-random.helper';
@@ -134,7 +135,7 @@ export class SearchRandomService {
             'scenes.shared.fetchVideoProgress',
             { fetchedCount: videos.length, videoCount: channel.videoCount, progressBar },
             ),
-        );
+        ).catch();
     }
 
     async onFetchEnd(ctx: ContextMessageUpdate, action: FetchAction<FetchActionType.VIDEOS_FETCHED>) {
@@ -184,15 +185,18 @@ export class SearchRandomService {
             case SearchType.RANDOM:
                 let filteredVideos = videos;
 
-                if (ctx.session.videoFilters.from) {
-                    filteredVideos = filteredVideos.filter((video) => +new Date(video.publishedTime) > from);
+                const fromValue = VIDEO_FILTERS_VALUES.get(ctx.session.videoFilters.from);
+                const toValue = VIDEO_FILTERS_VALUES.get(ctx.session.videoFilters.to);
+
+                if (fromValue) {
+                    filteredVideos = filteredVideos.filter((video) => +new Date(video.publishedTime) > Date.now() - fromValue);
                 }
 
-                if (ctx.session.videoFilters.to) {
-                    filteredVideos = filteredVideos.filter((video) => +new Date(video.publishedTime) < to);
+                if (toValue) {
+                    filteredVideos = filteredVideos.filter((video) => +new Date(video.publishedTime) < Date.now() - toValue);
                 }
 
-                return await asyncMap(getRandomItemsFromArray(videos, 10), validateVideo);
+                return await asyncMap(getRandomItemsFromArray(filteredVideos, 10), validateVideo);
 
             case SearchType.LATEST:
                 const from = Math.min(videos.length - 10, ctx.session.videoOffset);
