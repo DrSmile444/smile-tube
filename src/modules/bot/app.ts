@@ -5,12 +5,14 @@ import { ContextMessageUpdate } from 'telegraf-context';
 import { GenericMenu } from 'telegraf-menu';
 import * as LocalSession from 'telegraf-session-local';
 
-import { searchRandomController, startController } from './controllers';
+import { searchRandomController, settingsController, startController } from './controllers';
 import { SearchType } from './interfaces';
 import { initVideoFiltersMenu } from './menus';
 import { getUserInfo } from './middlewares';
 import { errorHandler } from './utils';
 require('dotenv').config();
+
+const { Stage } = Scenes;
 
 export class BotApp {
     private bot: Telegraf;
@@ -31,6 +33,7 @@ export class BotApp {
         const stage = new Scenes.Stage([
             startController,
             searchRandomController,
+            settingsController,
         ] as any);
 
         // this.bot.use(Telegraf.log());
@@ -59,6 +62,13 @@ export class BotApp {
                 await ctx.scene.enter('search-random', { type: SearchType.LATEST });
             }),
         );
+        this.bot.hears(
+            match('keyboards.mainKeyboard.settings'),
+            errorHandler(async (ctx: ContextMessageUpdate) => {
+                await ctx.scene.enter('settings');
+            }),
+        );
+        this.bot.hears(match('keyboards.backKeyboard.back'), Stage.leave<any>());
     }
 
     start() {

@@ -2,13 +2,14 @@ import { Scenes } from 'telegraf';
 import { ContextMessageUpdate } from 'telegraf-context';
 
 import { getMainKeyboard } from '../../utils/keyboard.util';
+import { getCtxInfo } from '../search-random/search-random.helper';
 
 const { BaseScene, Stage } = Scenes;
 
 export const startController = new BaseScene('start');
 
 startController.enter(async (ctx: ContextMessageUpdate) => {
-    const username = ctx.update.message.from.username;
+    const { username } = getCtxInfo(ctx);
     const { mainKeyboard } = getMainKeyboard(ctx);
 
     if (ctx.session.channel) {

@@ -24,14 +24,17 @@ export function getBackKeyboard(ctx: ContextMessageUpdate) {
 export function getMainKeyboard(ctx: ContextMessageUpdate) {
     const mainKeyboardSearchRandom = ctx.i18n.t('keyboards.mainKeyboard.searchRandom');
     const mainKeyboardSearchLatest = ctx.i18n.t('keyboards.mainKeyboard.searchLatest');
+    const mainKeyboardSettings = ctx.i18n.t('keyboards.mainKeyboard.settings');
 
     const mainKeyboard = Markup.keyboard([
         [mainKeyboardSearchRandom, mainKeyboardSearchLatest] as any,
+        [mainKeyboardSettings],
     ]).oneTime().resize();
 
     return {
         mainKeyboard,
         mainKeyboardSearchRandom,
         mainKeyboardSearchLatest,
+        mainKeyboardSettings,
     };
 }
