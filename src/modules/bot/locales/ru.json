@@ -19,7 +19,7 @@
   "keyboards.mainKeyboard.searchLatest": "🔍 Search latest 10 videos",
   "keyboards.mainKeyboard.settings": "⚙️ Настройки",
   "keyboards.backKeyboard.back": "◀️ Назад",
-  "menu.settings.start": "⚙️ What do you want to customize?",
+  "menu.settings.start": "⚙️ Что вы хотите настроить?",
   "menu.settings.button.videoFilters": "\uD83D\uDCFC Фильтры",
   "menu.settings.button.language": "\uD83C\uDFF4\u200D☠️ Языки",
   "menu.videoFilters.filter.start": "Начало",
@@ -29,5 +29,7 @@
   "menu.videoFilters.filter.threeMonths": "3 Месяца",
   "menu.videoFilters.filter.now": "Сейчас",
   "menu.videoFilters.start": "Вы можете отфильтровать диапазон рандомных видео.\n\nВыберите диапазон дат, по которым хотите искать их:",
-  "menu.videoFilters.submit": "Сохранить диапазон"
+  "menu.videoFilters.submit": "Сохранить диапазон",
+  "menu.language.start": "Выберите язык, который Вам нравится больше всего:",
+  "menu.language.submit": "Выглядит отлично!"
 }

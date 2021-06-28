@@ -2,7 +2,7 @@
 import * as moment from 'moment';
 import { ContextMessageUpdate } from 'telegraf-context';
 
-import { Language } from '../interfaces';
+import { Language } from '../const/language-filters.const';
 
 /**
  * Modifies context and add some information about the user

@@ -4,6 +4,7 @@ import { ContextMessageUpdate } from 'telegraf-context';
 import { GenericMenu } from 'telegraf-menu';
 
 import { initVideoFiltersMenu } from '../../menus';
+import { initLanguageMenu } from '../../menus/language.menu';
 import { getBackKeyboard, getMainKeyboard } from '../../utils/keyboard.util';
 import { getSearchedChannelsButtons } from './search-random.helper';
 import { SearchRandomService } from './search-random.service';
@@ -49,6 +50,11 @@ searchRandomController.command('video_filters', initVideoFiltersMenu);
 searchRandomController.action(/videoFilters/, GenericMenu.onAction(
     (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
     initVideoFiltersMenu,
+));
+searchRandomController.command('language', initLanguageMenu);
+searchRandomController.action(/language/, GenericMenu.onAction(
+    (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
+    initLanguageMenu,
 ));
 
 searchRandomController.on('text', (ctx: ContextMessageUpdate) => searchRandomService.onText(ctx));

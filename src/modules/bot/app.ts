@@ -8,6 +8,7 @@ import * as LocalSession from 'telegraf-session-local';
 import { searchRandomController, settingsController, startController } from './controllers';
 import { SearchType } from './interfaces';
 import { initVideoFiltersMenu } from './menus';
+import { initLanguageMenu } from './menus/language.menu';
 import { getUserInfo } from './middlewares';
 import { errorHandler } from './utils';
 require('dotenv').config();
@@ -47,6 +48,11 @@ export class BotApp {
         this.bot.action(/videoFilters/, GenericMenu.onAction(
             (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
             initVideoFiltersMenu,
+        ));
+        this.bot.command('language', initLanguageMenu);
+        this.bot.action(/language/, GenericMenu.onAction(
+            (ctx: ContextMessageUpdate) => ctx.scene.state.keyboardMenu,
+            initLanguageMenu,
         ));
 
         this.bot.start(errorHandler(async (ctx: ContextMessageUpdate) => ctx.scene.enter('start')));

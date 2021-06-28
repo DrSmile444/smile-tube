@@ -29,5 +29,7 @@
   "menu.videoFilters.filter.threeMonths": "3 Months",
   "menu.videoFilters.filter.now": "Now",
   "menu.videoFilters.start": "You can filter the range of random videos.\n\nSelect the date range by which you want to search for them:",
-  "menu.videoFilters.submit": "Save range"
+  "menu.videoFilters.submit": "Save range",
+  "menu.language.start": "Select a language you like the most:",
+  "menu.language.submit": "Looks good!"
 }

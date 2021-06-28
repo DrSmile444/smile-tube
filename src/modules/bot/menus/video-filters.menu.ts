@@ -5,7 +5,7 @@ import { VIDEO_FILTERS } from '../const/video-filters.const';
 import { VideoFilters } from '../interfaces';
 
 export const initVideoFiltersMenu = (ctx: ContextMessageUpdate, onSubmit?: (submitCtx: MenuContextUpdate<ContextMessageUpdate>) => any) => {
-    new RangeMenu<ContextMessageUpdate, VideoFilters>(
+    const menu = new RangeMenu<ContextMessageUpdate, VideoFilters>(
         {
             action: 'videoFilters',
             message: 'menu.videoFilters.start',
@@ -21,8 +21,15 @@ export const initVideoFiltersMenu = (ctx: ContextMessageUpdate, onSubmit?: (subm
                 changeCtx.session.videoFilters = state;
             },
             onSubmit(submitCtx): any {
-                onSubmit?.(submitCtx);
+                if (onSubmit) {
+                    return onSubmit?.(submitCtx);
+                }
+
+                menu.destroyMenu(submitCtx);
+                submitCtx.scene.enter('start');
             },
         },
-    ).sendMenu(ctx);
+    );
+
+    menu.sendMenu(ctx);
 };
